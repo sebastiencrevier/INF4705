@@ -7,7 +7,7 @@
 
 serie="0-9"
 
-for algo in `echo counting_sort`; do
+for algo in `echo counting_sort quicksort_fp quicksort_rp quicksort_fp_t quicksort_rp_t`; do
   # Fichier ou se trouves les exemplaires
   for ex in `ls ./ex/$serie`; do
     t=""
