@@ -5,11 +5,9 @@
 # la sortie de ce script vers un fichier csv et l'ouvrir avec R ou encore
 # python (avec matplotlib) pour faire les graphiques.
 
-serie="0-9"
-
 for algo in `echo counting_sort quicksort_fp quicksort_rp quicksort_fp_t quicksort_rp_t`; do
   # Fichier ou se trouves les exemplaires
-  for ex in `ls ./ex/$serie`; do
+  for ex in `ls ./ex`; do
     t=""
     t=`./tp.sh -a $algo -e ./ex/$serie/$ex -t`
     if [ "${t}" != "" ]; then

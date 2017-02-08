@@ -11,12 +11,11 @@ def counting_sort(arr, max_val):
     return arr
 
 
-def insertion_sort(arr):
-    for i in range(1, len(arr)):
-        j = i - 1
-        key = arr[i]
-        while (arr[j] > key) and (j >= 0):
-            arr[j + 1] = arr[j]
-            j -= 1
-            arr[j + 1] = key
-    return arr
+def insertion_sort(numList, first, last):
+    for x in range(first, last + 1):
+        key = numList[x]
+        y = x - 1
+        while y > -1 and numList[y] > key:
+            numList[y + 1] = numList[y]
+            y = y - 1
+        numList[y + 1] = key

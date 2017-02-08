@@ -7,27 +7,29 @@ class Quicksort(object):
         self.random_pivot = random_pivot
         self.threshold = threshold
 
-    def sort(self, arr):
-        less = []
-        pivotList = []
-        more = []
-        if len(arr) <= 1:
-            return arr
-        else:
-            pivot = random.choice(arr) if self.random_pivot else arr[0]
+    def sort(self, numList, first, last):
+        if first < last:
+            sizeArr = last - first + 1
 
-            # TODO : Find optimal threshold
-            if self.threshold and (len(arr) - pivot) < self.threshold:
-                insertion_sort(arr)
+            if self.threshold and sizeArr < self.threshold:
+                insertion_sort(numList, first, last)
+            else:
+                mid = self.partition(numList, first, last)
+                self.sort(numList, first, mid - 1)
+                self.sort(numList, mid + 1, last)
 
-            for i in arr:
-                if i < pivot:
-                    less.append(i)
-                elif i > pivot:
-                    more.append(i)
-                else:
-                    pivotList.append(i)
-            less = self.sort(less)
-            more = self.sort(more)
+    def partition(self, numList, first, last):
+        piv = random.choice(numList) if self.random_pivot else numList[first]
+        i = first - 1
+        for j in range(first, last):
+            if numList[j] < piv:
+                i += 1
+                temp = numList[i]
+                numList[i] = numList[j]
+                numList[j] = temp
 
-            return less + pivotList + more
+        tempo = numList[i + 1]
+        numList[i + 1] = numList[last]
+        numList[last] = tempo
+
+        return i + 1

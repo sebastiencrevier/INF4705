@@ -25,4 +25,4 @@ esac
 shift
 done
 
-python ./tp1.py -a $ALGO $EX_PATH $OPTIONS
+python ./tp1_run.py -a $ALGO $EX_PATH $OPTIONS
