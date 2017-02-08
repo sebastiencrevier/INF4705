@@ -13,21 +13,18 @@ def read(file):
 
 def compute(a, p, t):
     start_time = time.perf_counter()
-
     array = a()
-
     end_time = time.perf_counter()
+    compute_time = end_time - start_time
 
     if p:
         for el in array:
             print(el)
 
     if t:
-        compute_time = end_time - start_time
         print("%s" % compute_time)
-        return compute_time
 
-    return 0
+    return compute_time
 
 
 def main(file, a, t, p):
@@ -53,5 +50,8 @@ def main(file, a, t, p):
             raise ValueError('Wrong quicksort type')
 
         compute_time = compute(lambda: qs.sort(array, 0, len(array) - 1), p, t)
+
+    else:
+        return 0
 
     return compute_time
