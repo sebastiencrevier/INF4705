@@ -26,7 +26,7 @@ def execute_algo(n, x, y, a, run_time_times=False):
 n = [1000, 5000, 10000, 50000, 100000, 500000]
 x = range(3)
 y = range(10)
-a = ["quicksort_fp", "quicksort_rp", "quicksort_fp_t", "quicksort_rp_t", "counting_sort"]
+a = ["counting_sort", "quicksort_fp", "quicksort_rp", "quicksort_fp_t", "quicksort_rp_t"]
 
 print("Algorithme,Série,N,Temps moyen")
 
