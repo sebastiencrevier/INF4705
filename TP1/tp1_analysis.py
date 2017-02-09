@@ -20,7 +20,7 @@ def execute_algo(n, x, y, a, run_time_times=False):
 
                 arr.append(np.mean(value_arr))
 
-            print("{},{},{},{}".format(a, xx + 1, nn, np.mean(arr)))
+            print("{},{},{},{}".format(a, nn, xx + 1, np.mean(arr)))
 
 
 n = [1000, 5000, 10000, 50000, 100000, 500000]
@@ -28,7 +28,7 @@ x = range(3)
 y = range(10)
 a = ["counting_sort", "quicksort_fp", "quicksort_rp", "quicksort_fp_t", "quicksort_rp_t"]
 
-print("Algorithme,Série,N,Temps moyen")
+print("Algorithme,N,Série,Temps moyen")
 
 for aa in a:
     # If random pivot, execute 10 times
