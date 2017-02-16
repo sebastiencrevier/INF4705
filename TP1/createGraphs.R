@@ -1,4 +1,5 @@
 library(readr)
+library(ggplot2)
 
 #get the file and convert result in number
 results<-read_csv("~/INF4705/TP1/results.csv")
@@ -65,11 +66,11 @@ for (i in 1:3){
     titre=paste("Quick sort FP - Test Puissance - Serie ", i)
     jpeg(paste("~/INF4705/TP1/img/",titre))
     with(temp, plot((TempsMoyen) ~ (N),log="xy"))
-    abline(lm, col="blue",untf=TRUE)
+    abline(lm, col="blue", untf=TRUE)
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort FP - Test Rapport Meilleur Cas - Serie ", i) 
+    titre= paste("Quick sort FP - Test Rapport Meilleur Cas et Cas Moyen - Serie ", i) 
     jpeg(paste("~/INF4705/TP1/img/",titre))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     abline(lm, col="blue")
@@ -83,12 +84,6 @@ for (i in 1:3){
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort FP - Test Rapport Cas Moyen - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
-    with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
-    abline(lm, col="blue")
-    title(main = titre)
-    dev.off()
     
     #TODO : j'arrive pas a trouver comment implémenter ce test la
     #titre="Counting sort - Serie 1 - Test Constantes"
@@ -123,7 +118,7 @@ for (i in series){
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort FP avec seuil- Test Rapport Meilleur Cas - Serie ", i) 
+    titre= paste("Quick sort FP avec seuil- Test Rapport Meilleur Cas et Cas moyen - Serie ", i) 
     jpeg(paste("~/INF4705/TP1/img/",titre))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     abline(lm, col="blue")
@@ -136,13 +131,7 @@ for (i in series){
     abline(lm, col="blue")
     title(main = titre)
     dev.off()
-    
-    titre= paste("Quick sort FP avec seuil- Test Rapport Cas Moyen - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
-    with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
-    abline(lm, col="blue")
-    title(main = titre)
-    dev.off()
+  
     
     #TODO : j'arrive pas a trouver comment implémenter ce test la
     #titre="Counting sort - Serie 1 - Test Constantes"
@@ -177,7 +166,7 @@ for (i in series){
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort RP - Test Rapport Meilleur Cas - Serie ", i) 
+    titre= paste("Quick sort RP - Test Rapport Meilleur Cas et Cas moyen - Serie ", i) 
     jpeg(paste("~/INF4705/TP1/img/",titre))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     abline(lm, col="blue")
@@ -190,13 +179,7 @@ for (i in series){
     abline(lm, col="blue")
     title(main = titre)
     dev.off()
-    
-    titre= paste("Quick sort RP - Test Rapport Cas Moyen - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
-    with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
-    abline(lm, col="blue")
-    title(main = titre)
-    dev.off()
+
     
     #TODO : j'arrive pas a trouver comment implémenter ce test la
     #titre="Counting sort - Serie 1 - Test Constantes"
@@ -231,7 +214,7 @@ for (i in series){
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort RP avec seuil- Test Rapport Meilleur Cas - Serie ", i) 
+    titre= paste("Quick sort RP avec seuil- Test Rapport Meilleur Cas et Cas moyen - Serie ", i) 
     jpeg(paste("~/INF4705/TP1/img/",titre))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     abline(lm, col="blue")
@@ -239,13 +222,6 @@ for (i in series){
     dev.off()
     
     titre= paste("Quick sort RP avec seuil- Test Rapport Pire Cas - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
-    with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
-    abline(lm, col="blue")
-    title(main = titre)
-    dev.off()
-    
-    titre= paste("Quick sort RP avec seuil- Test Rapport Cas Moyen - Serie ", i) 
     jpeg(paste("~/INF4705/TP1/img/",titre))
     with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
     abline(lm, col="blue")
