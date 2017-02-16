@@ -1,4 +1,4 @@
-Algorithme,N,Série,Temps moyen
+Algorithme,N,serie,TempsMoyen
 counting_sort,1000,1,0.000465817
 counting_sort,1000,3,0.001178034
 counting_sort,5000,1,0.002416828
