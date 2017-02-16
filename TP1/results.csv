@@ -28,7 +28,7 @@ quicksort_fp,100000,2,0.350775822
 quicksort_fp,100000,3,8.981869051
 quicksort_fp,500000,1,2.205449003
 quicksort_fp,500000,2,2.062455141
-quicksort_fp,500000,3,????
+,,,
 quicksort_fp_t,1000,1,0.003176017
 quicksort_fp_t,1000,2,0.00208146
 quicksort_fp_t,1000,3,0.017869774
@@ -46,7 +46,7 @@ quicksort_fp_t,100000,2,0.329101844
 quicksort_fp_t,100000,3,8.889978082
 quicksort_fp_t,500000,1,1.900445669
 quicksort_fp_t,500000,2,1.910001612
-quicksort_fp_t,500000,3,????
+,,,
 quicksort_rp,1000,1,0.00721987
 quicksort_rp,1000,2,0.0065106
 quicksort_rp,1000,3,0.006998244

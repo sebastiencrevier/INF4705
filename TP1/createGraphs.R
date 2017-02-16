@@ -51,7 +51,7 @@ for (i in series){
 quicksort_fp<-subset(results, Algorithme == "quicksort_fp")
 series=1:3
 for (i in 1:3){ 
-  temp <- quicksort_fp[counting_sort$serie==series[i],]
+  temp <- quicksort_fp[quicksort_fp$serie==series[i],]
   if(is.data.frame(temp) && nrow(temp)!=0){
     
     titre=paste("Quick sort FP - Serie ",i)
