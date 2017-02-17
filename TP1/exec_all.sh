@@ -9,7 +9,7 @@ for algo in `echo counting_sort quicksort_fp quicksort_rp quicksort_fp_t quickso
   # Fichier ou se trouves les exemplaires
   for ex in `ls ./ex`; do
     t=""
-    t=`./tp.sh -a $algo -e ./ex/$serie/$ex -t`
+    t=`./tp.sh -a $algo -e ./ex/$ex -t`
     if [ "${t}" != "" ]; then
       # Si on a des noms d'exemplaires de la forme testset_n_ne.txt, on peut 
       # extraire la taille avec sed (par exemple...)

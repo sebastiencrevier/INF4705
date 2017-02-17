@@ -18,6 +18,8 @@ class Quicksort(object):
                 self.sort(numList, first, mid - 1)
                 self.sort(numList, mid + 1, last)
 
+            return numList
+
     def partition(self, numList, first, last):
         piv = random.choice(numList) if self.random_pivot else numList[first]
         i = first - 1

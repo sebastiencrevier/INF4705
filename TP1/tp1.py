@@ -13,12 +13,12 @@ def read(file):
 
 def compute(a, p, t):
     start_time = time.perf_counter()
-    array = a()
+    arr = a()
     end_time = time.perf_counter()
     compute_time = end_time - start_time
 
     if p:
-        for el in array:
+        for el in arr:
             print(el)
 
     if t:

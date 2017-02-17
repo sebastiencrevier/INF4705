@@ -2,7 +2,7 @@ library(readr)
 library(ggplot2)
 
 #get the file and convert result in number
-results<-read_csv("~/INF4705/TP1/results.csv")
+results<-read_csv("results.csv")
 results$TempsMoyen=as.numeric(results$TempsMoyen)
 results$N=as.numeric(results$N)
 
@@ -15,22 +15,22 @@ for (i in series){
   temp <- counting_sort[counting_sort$serie==series[i],]
   if(is.data.frame(temp) && nrow(temp)!=0){
     
-    titre=paste("Counting sort - Serie ",i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Counting sort - Serie",i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     lm = lm(TempsMoyen ~ N, data=temp)
     with(temp, plot((TempsMoyen) ~ (N)))
     abline(lm, col="blue")
     title(main = titre)
     dev.off()
     
-    titre=paste("Counting sort - Test Puissance - Serie ", i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Counting sort - Test Puissance - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen) ~ (N),log="xy"))
     title(main = titre)
     dev.off()
     
-    titre= paste("Counting sort - Test Rapport - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Counting sort - Test Rapport - Serie", i) 
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/N) ~ (N)))
     title(main = titre)
     dev.off()
@@ -53,28 +53,28 @@ for (i in 1:3){
   temp <- quicksort_fp[quicksort_fp$serie==series[i],]
   if(is.data.frame(temp) && nrow(temp)!=0){
     
-    titre=paste("Quick sort FP - Serie ",i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort FP - Serie",i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     lm = lm(TempsMoyen ~ N, data=temp)
     with(temp, plot((TempsMoyen) ~ (N)))
     abline(lm, col="blue")
     title(main = titre)
     dev.off()
     
-    titre=paste("Quick sort FP - Test Puissance - Serie ", i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort FP - Test Puissance - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen) ~ (N),log="xy"))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort FP - Test Rapport Meilleur Cas et Cas Moyen - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort FP - Test Rapport Meilleur Cas et Cas Moyen - Serie", i) 
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort FP - Test Rapport Pire Cas - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort FP - Test Rapport Pire Cas - Serie", i) 
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
     title(main = titre)
     dev.off()
@@ -98,28 +98,28 @@ for (i in series){
   temp <- quicksort_fp_t[quicksort_fp_t$serie==series[i],]
   if(is.data.frame(temp) && nrow(temp)!=0){
     
-    titre=paste("Quick sort FP avec seuil - Serie ",i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort FP avec seuil - Serie",i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     lm = lm(TempsMoyen ~ N, data=temp)
     with(temp, plot((TempsMoyen) ~ (N)))
     abline(lm, col="blue")
     title(main = titre)
     dev.off()
     
-    titre=paste("Quick sort FP avec seuil- Test Puissance - Serie ", i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort FP avec seuil - Test Puissance - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen) ~ (N),log="xy"))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort FP avec seuil- Test Rapport Meilleur Cas et Cas moyen - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort FP avec seuil - Test Rapport Meilleur Cas et Cas moyen - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort FP avec seuil- Test Rapport Pire Cas - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort FP avec seuil - Test Rapport Pire Cas - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
     title(main = titre)
     dev.off()
@@ -143,28 +143,28 @@ for (i in series){
   temp <- quicksort_rp[quicksort_rp$serie==series[i],]
   if(is.data.frame(temp) && nrow(temp)!=0){
     
-    titre=paste("Quick sort RP - Serie ",i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort RP - Serie",i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     lm = lm(TempsMoyen ~ N, data=temp)
     with(temp, plot((TempsMoyen) ~ (N)))
     abline(lm, col="blue")
     title(main = titre)
     dev.off()
     
-    titre=paste("Quick sort RP - Test Puissance - Serie ", i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort RP - Test Puissance - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen) ~ (N),log="xy"))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort RP - Test Rapport Meilleur Cas et Cas moyen - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort RP - Test Rapport Meilleur Cas et Cas moyen - Serie", i) 
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort RP - Test Rapport Pire Cas - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort RP - Test Rapport Pire Cas - Serie", i) 
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
     title(main = titre)
     dev.off()
@@ -188,28 +188,28 @@ for (i in series){
   temp <- quicksort_rp_t[quicksort_rp_t$serie==series[i],]
   if(is.data.frame(temp) && nrow(temp)!=0){
     
-    titre=paste("Quick sort RP avec seuil - Serie ",i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort RP avec seuil - Serie",i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     lm = lm(TempsMoyen ~ N, data=temp)
     with(temp, plot((TempsMoyen) ~ (N)))
     abline(lm,col="blue")
     title(main = titre)
     dev.off()
     
-    titre=paste("Quick sort RP avec seuil- Test Puissance - Serie ", i)
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre=paste("Quick sort RP avec seuil - Test Puissance - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen) ~ (N),log="xy"))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort RP avec seuil- Test Rapport Meilleur Cas et Cas moyen - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort RP avec seuil - Test Rapport Meilleur Cas et Cas moyen - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N*log(N))) ~ (N)))
     title(main = titre)
     dev.off()
     
-    titre= paste("Quick sort RP avec seuil- Test Rapport Pire Cas - Serie ", i) 
-    jpeg(paste("~/INF4705/TP1/img/",titre))
+    titre= paste("Quick sort RP avec seuil - Test Rapport Pire Cas - Serie", i)
+    jpeg(paste(getwd(),"/results/",titre,'.jpg',sep=''))
     with(temp, plot((TempsMoyen/(N^2)) ~ (N)))
     title(main = titre)
     dev.off()
