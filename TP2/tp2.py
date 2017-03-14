@@ -1,5 +1,5 @@
 import time
-import algos
+import vorace
 import sys
 
 
@@ -32,13 +32,13 @@ def main(file, a, t, p):
 
     if a == 'vorace':
         max_val = max(array)
-        compute_time = compute(lambda: algos.vorace(array, max_val), p, t)
+        compute_time = compute(lambda: vorace.vorace(array, max_val), p, t)
 
     elif a == 'dynamique':
-        compute_time = compute(lambda: algos.dynamique(array, max_val), p, t)
+        compute_time = compute(lambda: vorace.dynamique(array, max_val), p, t)
 
     elif a == 'retourArriere':
-        compute_time = compute(lambda: algos.retourArriere(array, max_val), p, t)
+        compute_time = compute(lambda: vorace.retourArriere(array, max_val), p, t)
 
     else:
         return 0
