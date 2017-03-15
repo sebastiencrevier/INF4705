@@ -4,7 +4,8 @@ def backtrack_recursive(G, ext):
     exts = []
 
     for n in G.nodes():
-        if G.edges() and not G.successors(n) and G.predecessors(n):
+        # if leaf still has a parent, ignore
+        if not G.successors(n) and G.predecessors(n):
             continue
 
         temp = ext.copy()
@@ -15,9 +16,11 @@ def backtrack_recursive(G, ext):
 
         result = backtrack_recursive(g, temp)
 
+        # add the recursively found extensions to the list
         for r in result:
             exts.append(r)
 
+        # if last node, add a new extension to the list
         if len(G.nodes()) == 1:
             exts.append(temp)
 
