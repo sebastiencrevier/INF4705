@@ -38,10 +38,6 @@ def entropy(G, L):
     return 2 ** (1 / 2 * len(G.nodes()) * h)
 
 
-if __name__ == "__main__":
-    G = nx.DiGraph()
-    G.add_edges_from([(1, 0), (1, 4), (1, 8), (2, 5), (5, 8), (6, 0), (6, 2), (6, 4), (7, 2), (9, 3), (9, 6), (9, 7)])
-
+def vorace(G):
     L = chain_decomposition(G)
-    e = entropy(G, L)
-    print(e)
+    return entropy(G, L)

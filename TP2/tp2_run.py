@@ -1,5 +1,5 @@
 import argparse
-from tp1 import main
+from tp2 import main
 
 
 def parse_arguments():
