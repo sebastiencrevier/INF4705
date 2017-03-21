@@ -1,6 +1,9 @@
+import copy
+
+
 def backtrack_recursive(G, ext):
     exts = []
-    nodes = G.nodes()
+    nodes = G.vertices
 
     for n in nodes:
         pred = G.predecessors(n)
@@ -10,8 +13,8 @@ def backtrack_recursive(G, ext):
         temp = ext.copy()
         temp.append(n)
 
-        g = G.copy()
-        g.remove_node(n)
+        g = copy.deepcopy(G)
+        g.remove_vertex(n)
 
         result = backtrack_recursive(g, temp)
 

@@ -1,17 +1,17 @@
+from dag import Graph
 import time
 import sys
 from backtrack import backtrack
 from vorace import vorace
-import networkx as nx
 
 
 def read(file):
     with open(file) as f:
-        next(f)
+        vertexCount = f.readline().split()[0]
         content = f.readlines()
     content = [tuple(x.split()) for x in content]
 
-    return content
+    return vertexCount, content
 
 
 def compute(a, p, t):
@@ -32,10 +32,8 @@ def compute(a, p, t):
 def main(file, a, t, p):
     sys.setrecursionlimit(500000)
 
-    edges = read(file)
-
-    G = nx.DiGraph()
-    G.add_edges_from(edges)
+    vertexCount, edges = read(file)
+    G = Graph(vertexCount, edges)
 
     if a == 'vorace':
         compute_time = compute(lambda: vorace(G), p, t)
