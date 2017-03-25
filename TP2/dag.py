@@ -17,9 +17,11 @@ class Graph:
     def has_edge(self, start, end):
         return self.adj[start][end] == 1
 
-    def predecessors(self, vertex):
+    def predecessors(self, vertex, vertices_to_ignore=None):
+        if vertices_to_ignore is None:
+            vertices_to_ignore = []
         p = []
-        for v in self.vertices:
+        for v in [x for x in self.vertices if x not in vertices_to_ignore]:
             if self.has_edge(v, vertex):
                 p.append(v)
         return p

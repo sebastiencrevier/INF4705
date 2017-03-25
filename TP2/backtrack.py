@@ -1,22 +1,22 @@
 import copy
 
 
-def backtrack_recursive(G, ext):
+def backtrack_recursive(G, ext, removed_nodes):
     exts = []
-    nodes = G.vertices
+    nodes = [x for x in G.vertices if x not in removed_nodes]
 
     for n in nodes:
-        pred = G.predecessors(n)
+        pred = G.predecessors(n, removed_nodes)
         if pred and pred not in ext:
             continue
 
         temp = ext.copy()
         temp.append(n)
 
-        g = copy.deepcopy(G)
-        g.remove_vertex(n)
+        temp2 = removed_nodes.copy()
+        temp2.append(n)
 
-        result = backtrack_recursive(g, temp)
+        result = backtrack_recursive(G, temp, temp2)
 
         # add the recursively found extensions to the list
         for r in result:
@@ -30,5 +30,5 @@ def backtrack_recursive(G, ext):
 
 
 def backtrack(G):
-    extensions = backtrack_recursive(G, [])
+    extensions = backtrack_recursive(G, [], [])
     return len(extensions)
