@@ -1,5 +1,3 @@
-import copy
-
 
 def backtrack_recursive(G, ext, removed_nodes):
     exts = []
@@ -10,10 +8,10 @@ def backtrack_recursive(G, ext, removed_nodes):
         if pred and pred not in ext:
             continue
 
-        temp = ext.copy()
+        temp = ext[:]
         temp.append(n)
 
-        temp2 = removed_nodes.copy()
+        temp2 = removed_nodes[:]
         temp2.append(n)
 
         result = backtrack_recursive(G, temp, temp2)
