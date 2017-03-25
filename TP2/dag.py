@@ -1,5 +1,6 @@
 import copy
 
+
 class Graph:
     def __init__(self, vertex_count, edges):
         vertex_count = int(vertex_count)

@@ -27,7 +27,7 @@ def compute(a, p, t):
     if t:
         print("%s" % compute_time)
 
-    return compute_time
+    return extensions, compute_time
 
 
 def main(file, a, t, p):
@@ -37,15 +37,15 @@ def main(file, a, t, p):
     G = Graph(vertexCount, edges)
 
     if a == 'vorace':
-        compute_time = compute(lambda: vorace(G), p, t)
+        e, t = compute(lambda: vorace(G), p, t)
 
     elif a == 'dynamique':
-        compute_time = compute(lambda: dynamic(G), p, t)
+        e, t = compute(lambda: dynamic(G), p, t)
 
     elif a == 'retourArriere':
-        compute_time = compute(lambda: backtrack(G), p, t)
+        e, t = compute(lambda: backtrack(G), p, t)
 
     else:
         return 0
 
-    return compute_time
+    return e, t
