@@ -3,6 +3,7 @@ import time
 import sys
 from backtrack import backtrack
 from vorace import vorace
+from dynamic import dynamic
 
 
 def read(file):
@@ -39,7 +40,7 @@ def main(file, a, t, p):
         compute_time = compute(lambda: vorace(G), p, t)
 
     elif a == 'dynamique':
-        compute_time = 0
+        compute_time = compute(lambda: dynamic(G), p, t)
 
     elif a == 'retourArriere':
         compute_time = compute(lambda: backtrack(G), p, t)
