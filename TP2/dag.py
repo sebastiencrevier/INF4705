@@ -1,5 +1,3 @@
-import copy
-
 
 class Graph:
     def __init__(self, vertex_count, edges):
@@ -31,7 +29,7 @@ class Graph:
 
     def remove_vertices(self, vertices):
         for v in vertices:
-            self.vertices.remove(v)
+            self.remove_vertex(v)
 
     def in_degree(self):
         degrees = {v: 0 for v in self.vertices}
@@ -66,12 +64,15 @@ class Graph:
         return p
 
     def hsu(self, m):
-        """ Transforms a given directed acyclic graph into its minimal equivalent """
-        n = len(m)
-        for j in range(n):
-            for i in range(n):
+        # reflexive reduction
+        for i in range(len(self.vertices)):
+            m[i][i] = 0
+
+        # transitive reduction
+        for j in range(len(self.vertices)):
+            for i in range(len(self.vertices)):
                 if m[i][j]:
-                    for k in range(n):
+                    for k in range(len(self.vertices)):
                         if m[j][k]:
                             m[i][k] = 0
 
@@ -113,23 +114,18 @@ class Graph:
         path.reverse()
         return path
 
-
-
     def chain_decomposition(self):
-        g = copy.deepcopy(self)
-
-        # TODO: Vérifier transitive reduction??
-        m = self.path(g.adj)
+        m = self.path(self.adj)
         self.hsu(m)
-        g.adj = m
+        self.adj = m
 
         L = []
-        c = g.longest_path()
+        c = self.longest_path()
         while c:
-            g.remove_vertices(c)
+            self.remove_vertices(c)
             L.append(c)
-            c = g.longest_path()
-        for n in g.vertices:
+            c = self.longest_path()
+        for n in self.vertices:
             L.append([n])
 
         return L
