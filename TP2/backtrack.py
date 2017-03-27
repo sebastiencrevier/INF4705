@@ -1,6 +1,6 @@
 
 def backtrack_recursive(G, ext):
-    exts = []
+    exts = 0
     nodes = [x for x in G.vertices if x not in ext]
 
     for n in nodes:
@@ -20,15 +20,15 @@ def backtrack_recursive(G, ext):
         result = backtrack_recursive(G, temp)
 
         # add the recursively found extensions to the list
-        exts.extend(result)
+        exts += result
 
         # if last node, add a new extension to the list
         if len(nodes) == 1:
-            exts.append(temp)
+            exts += 1
 
     return exts
 
 
 def backtrack(G):
     extensions = backtrack_recursive(G, [])
-    return len(extensions)
+    return extensions
