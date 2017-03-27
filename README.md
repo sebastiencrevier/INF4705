@@ -1,7 +1,7 @@
 # INF4705
 
 # Copy files from local to remote:
-scp -r TP1 secre@l4714-02.info.polymtl.ca:~/Documents/inf4705/TP1
+scp -r TP1 secre@l4714-02.info.polymtl.ca:~/Documents/inf4705
 
 # Login to remote:
 ssh secre@l4714-02.info.polymtl.ca

@@ -1,38 +1,34 @@
-from tp2 import main
 import numpy as np
+import argparse
+from tp2 import main
 
 
-def execute_algo(n, x, y, a, run_time_times=False):
-    for nn in n:
-        for xx in x:
-            # Don't compute the 2nd serie with counting sort => values are too large
-            if a == "counting_sort" and xx == 1:
-                continue
+def parse_arguments():
+    parser = argparse.ArgumentParser()
 
-            arr = []
-            for yy in y:
-                i = 10 if run_time_times else 1
-                value_arr = []
+    parser.add_argument('-e', type=str, nargs='*', default=[
+        "10-4", "10-6", "10-8",
+        "14-4", "14-6", "14-8", "14-10",
+        "18-4", "18-6", "18-8", "18-10",
+        "22-4", "22-6", "22-8", "22-10",
+        "26-4", "26-6", "26-8", "26-10",
+        "30-4", "30-6", "30-8", "30-10"])
+    parser.add_argument('-a', type=str, nargs='*', default=["vorace", "retourArriere", "dynamique"])
+    parser.add_argument('-n', type=str, nargs='*', default=["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"])
 
-                while i != 0:
-                    value_arr.append(main("./ex/testset_{}_{}.txt".format(nn, xx * 10 + yy), a, False, False))
-                    i -= 1
+    namespace = parser.parse_args()
+    return namespace
 
-                arr.append(np.mean(value_arr))
+ns = parse_arguments()
 
-            print("{},{},{},{}".format(a, nn, xx + 1, np.mean(arr)))
+print("Algorithme,Série,Extensions linéaires,Temps")
 
+for aa in ns.a:
+    for ee in ns.e:
+        arr = []
+        for nn in ns.n:
+            ext, t = main("./ex/poset{}{}".format(ee, nn), aa, False, False)
+            arr.append((ext, t))
+            print("{}{} - {}".format(ee, nn, t))
 
-n = [1000, 5000, 10000, 50000, 100000, 500000]
-x = range(3)
-y = range(10)
-a = ["vorace", "dynamique", "retourArriere"]
-
-print("Algorithme,N,Série,Temps moyen")
-
-for aa in a:
-    # If random pivot, execute 10 times
-    if "rp" in aa:
-        execute_algo(n, x, y, aa, True)
-    else:
-        execute_algo(n, x, y, aa)
+        print("{},{},{},{}".format(aa, ee, np.mean([x[0] for x in arr]), np.mean([x[1] for x in arr])))

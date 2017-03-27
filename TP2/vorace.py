@@ -1,15 +1,17 @@
 import math
 
-def entropy(G, L):
+
+def entropy(nodes, chains):
     h = 0
 
-    for l in L:
-        val = len(l) / len(G.vertices)
+    for c in chains:
+        val = len(c) / nodes
         h -= val * math.log(val, 2)
 
-    return 2 ** (1 / 2 * len(G.vertices) * h)
+    return 2 ** (1 / 2 * nodes * h)
 
 
 def vorace(G):
-    L = G.chain_decomposition()
-    return entropy(G, L)
+    nodes = len(G.vertices)
+    chains = G.chain_decomposition()
+    return entropy(nodes, chains)

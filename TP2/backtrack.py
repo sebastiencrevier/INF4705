@@ -1,34 +1,34 @@
-import copy
-
 
 def backtrack_recursive(G, ext):
-    exts = []
-    nodes = G.vertices
+    exts = 0
+    nodes = [x for x in G.vertices if x not in ext]
 
     for n in nodes:
-        pred = G.predecessors(n)
-        if pred and pred not in ext:
+        has_predecessors = False
+
+        for x in nodes:
+            if G.has_edge(x, n):
+                has_predecessors = True
+                break
+
+        if has_predecessors:
             continue
 
-        temp = ext.copy()
+        temp = ext[:]
         temp.append(n)
 
-        g = copy.deepcopy(G)
-        g.remove_vertex(n)
-
-        result = backtrack_recursive(g, temp)
+        result = backtrack_recursive(G, temp)
 
         # add the recursively found extensions to the list
-        for r in result:
-            exts.append(r)
+        exts += result
 
         # if last node, add a new extension to the list
         if len(nodes) == 1:
-            exts.append(temp)
+            exts += 1
 
     return exts
 
 
 def backtrack(G):
     extensions = backtrack_recursive(G, [])
-    return len(extensions)
+    return extensions
