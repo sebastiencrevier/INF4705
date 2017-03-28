@@ -1,0 +1,5 @@
+- Rouler le process 4 fois en parallèle (1 par core), pour explorer différentes heuristiques avec des hyperparamètres différents.
+- Si une meilleure solution est trouvée, notifier les processes.
+- Peut avoir plusieurs graphes non reliés si coût moindre.
+- Utiliser <thread> de C++11.
+- Réserver un espace mémoire partagé entre les threads avec un mutex.
