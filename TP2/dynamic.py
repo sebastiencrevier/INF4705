@@ -1,5 +1,6 @@
 from dag import Graph
 import numpy as np
+import utilities as util
 
 #Pour linstant fonctionne seulement avec l<exemplaire mit dans "main" en dessous
 #TODO: Il faudrait plutot faire les 2 premieres dimensions dans create_arr_recursive() et apres dans create_arr_recursion ()  faire les calculs pour chaque dimensions supp
@@ -7,7 +8,7 @@ import numpy as np
 
 def dynamic(G):
     fermeture_transitive(G)
-    return create_arr_recursive(G)
+    return reconstructPath(G)
 
 def max_value(list):
     return max(len(slist) for slist in list)
@@ -23,41 +24,45 @@ def fermeture_transitive(G):
                 if(c[i][j] < m[i][k] * m[k][j]):
                     m[i][j] +=   m[i][k] * m[k][j]
 
-def create_arr_recursive(G):
+
+
+
+def create_array_recursive(G):
     chains = G.chain_decomposition()
     nbDimension = len(chains)
     y=0
+    nb_ext = 0
     max_val = max_value(chains)
-    tab=[]
+    tab= np.ones(1,int)
+    for i in range(nbDimension):
+        tab = util.add_dimension(tab, len(chains[i]+1))
+    n=nbDimension
 
-    return create_arr_recursion(G,chains,y,nbDimension, tab, max_val-1,0)
+    create_array_recursion(n,G,chains,nbDimension, tab[0])
 
-def create_arr_recursion(G,chains,y,taille, tab, max_val,nb_ext):
 
-    if (taille == 0):
-        return nb_ext
+def create_array_recursion(n,G,chains,nbDimension, tab):
 
-    tab.append([0]* (max_val+1))
-    for i in range(max_val+1):
+    if n>1:
+        index = []
+        val = parcours(tab, 0, 0, index)
+        create_array_recursion(n-1,G, chains,nbDimension,tab[x])
 
-        if i == 0 or y == 0:
-            tab[y][i]= 1
+
+    if n == 0:
+        arr = tab[-1]
+        while nbDimension > 1:
+            arr = arr[-1]
+            nbDimension -= 1
+
+        return arr[-1]
+
+
+def parcours(array, x, y, index):
+    for i in range(len(array)):
+        elem = array[i]
+        if elem is int:
+            index.append(i)
+            return elem
         else:
-            premier = tab[y - 1][i]
-            deuxieme = tab[y][i-1]
-            #Si les predecesseurs du noeud quon ajoute sont deja présent ont doit multiplier par 0
-            h = G.predecessors(chains[y-1][0 if len(chains[y-1]) == 1 else i-1])
-            if len(h) > 0 and (y or i) in h :
-                premier = 0 * premier
-
-            tab[y][i] = premier + deuxieme
-            if(taille==1):
-                nb_ext= tab[y][i]
-    return create_arr_recursion(G, chains, y + 1, taille - 1, tab, max_val, nb_ext)
-
-#TESTER LES 2 ALGOS QUON A LES TABLEAUX
-# if __name__ == '__main__':
-#     edges = [(0, 2), (1, 2), (2, 3)]
-#     G = Graph(4, edges)
-#     dynamic(G)
-
+            return parcours(elem, x, y, index)
