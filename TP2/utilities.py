@@ -6,7 +6,9 @@ def add_dimension(array, size, in_front=False):
     axis = 0 if in_front else len(array.shape)
     return np.stack(arrays, axis=axis)
 
-a = np.random.randn(3, 4)
-b = add_dimension(a, 10)
 
-print(b.shape)
+a = np.zeros(1, int)
+a = add_dimension(a, 4)
+a = add_dimension(a, 2)
+
+print(a[0])

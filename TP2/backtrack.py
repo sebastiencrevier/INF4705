@@ -1,7 +1,6 @@
 
-def backtrack_recursive(G, ext):
+def backtrack_recursive(G, nodes):
     exts = 0
-    nodes = [x for x in G.vertices if x not in ext]
 
     for n in nodes:
         has_predecessors = False
@@ -14,8 +13,8 @@ def backtrack_recursive(G, ext):
         if has_predecessors:
             continue
 
-        temp = ext[:]
-        temp.append(n)
+        temp = nodes[:]
+        temp.remove(n)
 
         result = backtrack_recursive(G, temp)
 
@@ -30,5 +29,5 @@ def backtrack_recursive(G, ext):
 
 
 def backtrack(G):
-    extensions = backtrack_recursive(G, [])
+    extensions = backtrack_recursive(G, G.vertices)
     return extensions
