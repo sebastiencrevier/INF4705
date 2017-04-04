@@ -1,6 +1,10 @@
 #include <iostream>
+#include "Graph.h"
 
 int main() {
-	std::cout << "Hello world!";
+	Graph g("data/Parc4-20Zones.txt");
+
+	g.primMST();
+
 	return 0;
 }
