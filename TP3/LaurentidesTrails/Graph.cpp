@@ -140,3 +140,80 @@ void Graph::primMST() {
 
 	printf("%f\n", totalWeight);
 }
+
+void Graph::kruskal() {
+	auto edges = map<pair<int, int>, float>();
+	for (int i = 0; i < this->V; i++) {
+		for each (PointWeightPair pair in this->adj[i]) {
+			if (pair.first->id > i)
+				edges.insert(make_pair(make_pair(i, pair.first->id), pair.second));
+		}
+	}
+
+	auto ee = vector<tuple<Point*, Point*, float>>();
+	for (const auto & e : edges) { ee.push_back(make_tuple(points[e.first.first], points[e.first.second], e.second)); }
+
+	std::sort(ee.begin(), ee.end(),
+		[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
+		return get<2>(a) < get<2>(b);
+	});
+
+	auto E = vector<tuple<Point*, Point*, float>>();
+	int k = 1;
+
+	for each (auto point in this->points) {
+		point->reset();
+	}
+
+	while (E.size() < this->V - 1 && k < ee.size()) {
+		auto ek = ee[k];
+		auto i = get<0>(ek);
+		auto j = get<1>(ek);
+
+		if (i->canConnect() && j->canConnect()) {
+			E.push_back(ek);
+			i->connect(j);
+		}
+		k++;
+	}
+
+	for each (auto p in this->points) {
+		while (!p->isComplete()) {
+			for each (auto e in ee) {
+				auto i = get<0>(e), j = get<1>(e);
+				if (i == p || j == p && i->canConnect() && j->canConnect()) {
+					if (std::find(E.begin(), E.end(), e) != E.end()) {
+						continue;
+					}
+
+					i->connect(j);
+					E.push_back(e);
+					break;
+				}
+			}
+			// Stuck
+
+		}
+	}
+	auto it = E.begin();
+	while(it != E.end()) {
+		auto i = get<0>(*it);
+		auto j = get<1>(*it);
+		i->disconnect(j);
+
+		if (!i->isComplete(true) || !j->isComplete(true)) {
+			i->connect(j);
+			++it;
+		}
+		else {
+			it = E.erase(it);
+		}
+	}
+
+	auto cost = 0.0f;
+	for each (auto e in E) {
+		printf("%d-%d : %f\n", get<0>(e)->id, get<1>(e)->id, get<2>(e));
+		cost += get<2>(e);
+	}
+	printf("%f$\n", cost);
+}

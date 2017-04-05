@@ -19,4 +19,5 @@ public:
 	void addEdge(Point* u, Point* v, float w);
 	float findWeight(int u, int v);
 	void primMST();
+	void kruskal();
 };

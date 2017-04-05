@@ -1,4 +1,7 @@
 #pragma once
+#include <set>
+
+using namespace std;
 
 enum class PointType {
 	UNDEFINED = 0,
@@ -15,12 +18,15 @@ public:
 	int id = -1;
 
 	bool canConnect();
-	void connect();
-	bool isComplete();
+	void connect(Point* p);
+	void disconnect(Point* p);
+	bool isComplete(bool checkEntrance = false);
+	bool isReachable(set<Point*> visited);
 	void reset();
 
 private:
 	PointType _type = PointType::UNDEFINED;
 	int _maxEdgeCount = 0;
 	int _edgeCount = 0;
+	set<Point*> _neighbors;
 };

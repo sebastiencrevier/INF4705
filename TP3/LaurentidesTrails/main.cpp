@@ -2,9 +2,9 @@
 #include "Graph.h"
 
 int main() {
-	Graph g("data/Parc4-20Zones.txt");
+	Graph g("data/Parc2-20Zones.txt");
 
-	g.primMST();
+	g.kruskal();
 
 	return 0;
 }
