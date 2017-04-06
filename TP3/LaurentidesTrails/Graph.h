@@ -3,7 +3,6 @@
 #include "stdc++.h"
 #include "Point.h"
 using namespace std;
-#define INF 0x3f3f3f3f
 
 typedef pair<Point*, float> PointWeightPair;
 
@@ -18,6 +17,8 @@ public:
 
 	void addEdge(Point* u, Point* v, float w);
 	float findWeight(int u, int v);
-	void primMST();
+
 	void kruskal();
+	void filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E);
+	void connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Point*, Point*, float>>& ee, vector<tuple<Point*, Point*, float>>& E, bool keepUnsuccessfulConnections = false);
 };

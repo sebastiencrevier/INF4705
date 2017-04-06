@@ -1,5 +1,6 @@
 #pragma once
 #include <set>
+#include <vector>
 
 using namespace std;
 
@@ -18,11 +19,13 @@ public:
 	int id = -1;
 
 	bool canConnect();
-	void connect(Point* p);
+	bool connect(Point* p);
 	void disconnect(Point* p);
-	bool isComplete(bool checkEntrance = false);
-	bool isReachable(set<Point*> visited);
+	bool isComplete();
 	void reset();
+
+	void reachablePoints(set<Point*>& points, set<Point*> visited);
+	bool connectedToEntrance(vector<Point*>& tree);
 
 private:
 	PointType _type = PointType::UNDEFINED;

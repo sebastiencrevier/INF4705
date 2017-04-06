@@ -58,90 +58,8 @@ float Graph::findWeight(int u, int v) {
 	return it->second;
 }
 
-// Prints shortest paths from src to all other vertices
-void Graph::primMST() {
-	// Create a priority queue to store vertices that
-	// are being preinMST. This is weird syntax in C++.
-	// Refer below link for details of this syntax
-	// http://geeksquiz.com/implement-min-heap-using-stl/
-	priority_queue< pair<float, int>, vector <pair<float, int>>, greater<pair<float, int>> > pq;
-
-	int src = 0; // Taking vertex 0 as source
-
-				 // Create a vector for keys and initialize all
-				 // keys as infinite (INF)
-	vector<float> key(V, INF);
-
-	// To store parent array which in turn store MST
-	vector<int> parent(V, -1);
-
-	// To keep track of vertices included in MST
-	vector<bool> inMST(V, false);
-
-	// Insert source itself in priority queue and initialize
-	// its key as 0.
-	pq.push(make_pair(0, src));
-	key[src] = 0;
-
-	/* Looping till priority queue becomes empty */
-	while (!pq.empty()) {
-		// The first vertex in pair is the minimum key
-		// vertex, extract it from priority queue.
-		// vertex label is stored in second of pair (it
-		// has to be done this way to keep the vertices
-		// sorted key (key must be first item
-		// in pair)
-		int u = pq.top().second;
-		pq.pop();
-
-		inMST[u] = true;  // Include vertex in MST
-
-		// 'i' is used to get all adjacent vertices of a vertex
-		vector< PointWeightPair >::iterator i;
-		for (i = this->adj[u].begin(); i != this->adj[u].end(); ++i) {
-			// Get vertex label and weight of current adjacent
-			// of u.
-			int v = (*i).first->id;
-			float weight = (*i).second;
-
-			//  If v is not in MST and weight of (u,v) is smaller
-			// than current key of v
-			if (inMST[v] == false && key[v] > weight) {
-				auto vv = this->points[v];
-				auto uu = this->points[u];
-
-				//if (vv->canConnect() && uu->canConnect()) {
-				//	vv->connect();
-				//	uu->connect();
-
-				//	// Updating key of v
-				//	key[v] = weight;
-				//	pq.push(make_pair(key[v], v));
-				//	parent[v] = u;
-				//}
-
-				// Updating key of v
-				key[v] = weight;
-				pq.push(make_pair(key[v], v));
-				parent[v] = u;
-			}
-		}
-	}
-
-	float totalWeight = 0.0f;
-
-	// Print edges of MST using parent array
-	for (int i = 1; i < V; ++i) {
-		float weight = this->findWeight(parent[i], i);
-		totalWeight += weight;
-
-		printf("%d-%d : %f\n", parent[i], i, weight);
-	}
-
-	printf("%f\n", totalWeight);
-}
-
 void Graph::kruskal() {
+	// Order edges by minimal cost
 	auto edges = map<pair<int, int>, float>();
 	for (int i = 0; i < this->V; i++) {
 		for each (PointWeightPair pair in this->adj[i]) {
@@ -161,59 +79,126 @@ void Graph::kruskal() {
 	auto E = vector<tuple<Point*, Point*, float>>();
 	int k = 1;
 
+	// Reset points
 	for each (auto point in this->points) {
 		point->reset();
 	}
 
-	while (E.size() < this->V - 1 && k < ee.size()) {
+	set<int> unusedEdgeIndices;
+	for (int i = 0; i < ee.size(); i++) {
+		unusedEdgeIndices.insert(i);
+	}
+
+	// Kruskal MST
+	while (k < ee.size() &&
+		std::any_of(this->points.begin(), this->points.end(), [](Point* p) {return !p->isComplete(); })) {
+
 		auto ek = ee[k];
 		auto i = get<0>(ek);
 		auto j = get<1>(ek);
 
 		if (i->canConnect() && j->canConnect()) {
-			E.push_back(ek);
-			i->connect(j);
+			auto connected = i->connect(j);
+			if (connected) {
+				E.push_back(ek);
+				unusedEdgeIndices.erase(k);
+
+				bool saturated = true;
+				for each (auto e in E) {
+					if (get<0>(e)->canConnect() || get<1>(e)->canConnect()) {
+						saturated = false;
+					}
+				}
+
+				if (saturated) {
+					E.pop_back();
+					i->disconnect(j);
+					unusedEdgeIndices.insert(k);
+				}
+			}
 		}
 		k++;
 	}
 
+	if (k == ee.size()) {
+		cout << "Warning: Kruskal didn't manage to complete all the points!\n";
+	}
+
+	this->filterUnnecessaryEdges(E);
+
+	this->connectedInvalidPoints(unusedEdgeIndices, ee, E);
+
+	this->filterUnnecessaryEdges(E);
+
+	this->connectedInvalidPoints(unusedEdgeIndices, ee, E, true);
+
+	this->filterUnnecessaryEdges(E);
+
+	// Print out invalid points if there are any left
 	for each (auto p in this->points) {
-		while (!p->isComplete()) {
-			for each (auto e in ee) {
-				auto i = get<0>(e), j = get<1>(e);
-				if (i == p || j == p && i->canConnect() && j->canConnect()) {
-					if (std::find(E.begin(), E.end(), e) != E.end()) {
-						continue;
-					}
-
-					i->connect(j);
-					E.push_back(e);
-					break;
-				}
-			}
-			// Stuck
-
+		if (!p->connectedToEntrance(this->points) || !p->isComplete()) {
+			printf("Point %d is not valid!\n", p->id);
 		}
 	}
+
+	// Print out results
+	cout << "\n\n---------------- Results ----------------\n";
+	auto cost = 0.0f;
+	for each (auto e in E) {
+		printf("%d-%d:\t%f\n", get<0>(e)->id, get<1>(e)->id, get<2>(e));
+		cost += get<2>(e);
+	}
+	cout << "-----------------------------------------\n";
+	printf("Total cost:\t%f\n", cost);
+	cout << "-----------------------------------------\n";
+}
+
+void Graph::filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E) {
 	auto it = E.begin();
-	while(it != E.end()) {
+	while (it != E.end()) {
 		auto i = get<0>(*it);
 		auto j = get<1>(*it);
 		i->disconnect(j);
 
-		if (!i->isComplete(true) || !j->isComplete(true)) {
+		if (!i->isComplete() || !j->isComplete() || !i->connectedToEntrance(this->points) || !j->connectedToEntrance(this->points)) {
 			i->connect(j);
 			++it;
-		}
-		else {
+		} else {
+			printf("Removing extra edge: %d-%d\n", i->id, j->id);
 			it = E.erase(it);
 		}
 	}
+}
 
-	auto cost = 0.0f;
-	for each (auto e in E) {
-		printf("%d-%d : %f\n", get<0>(e)->id, get<1>(e)->id, get<2>(e));
-		cost += get<2>(e);
+void Graph::connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Point*, Point*, float>>& ee,
+	vector<tuple<Point*, Point*, float>>& E, bool keepUnsuccessfulConnections) {
+	for each (auto p in this->points) {
+		auto it = unusedEdgeIndices.begin();
+
+		if (!p->connectedToEntrance(this->points)) {
+			printf("Point %d not connected to entrance!\n", p->id);
+		}
+		if (!p->isComplete()) {
+			printf("Point %d not complete!\n", p->id);
+		}
+
+		while (it != unusedEdgeIndices.end() && (!p->connectedToEntrance(this->points) || !p->isComplete())) {
+			auto edge = ee[*it];
+			auto i = get<0>(edge);
+			auto j = get<1>(edge);
+
+			if (i->canConnect() && j->canConnect()) {
+				auto connected = i->connect(j);
+				if (connected) {
+					if (!keepUnsuccessfulConnections && (!p->connectedToEntrance(this->points) || !p->isComplete())) {
+						i->disconnect(j);
+					} else {
+						printf("Added edge %d-%d\n", i->id, j->id);
+						E.push_back(edge);
+					}
+				}
+			}
+			it++;
+		}
 	}
-	printf("%f$\n", cost);
 }

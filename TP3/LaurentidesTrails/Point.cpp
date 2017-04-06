@@ -20,14 +20,22 @@ bool Point::canConnect() {
 	return true;
 }
 
-void Point::connect(Point* p) {
-	if (this->canConnect() && p->canConnect()) {
+bool Point::connect(Point* p) {
+	if (this->_type == PointType::VIEWPOINT && p->_type == PointType::VIEWPOINT) {
+		return false;
+	}
+
+	if (this->canConnect() && p->canConnect() && this->_neighbors.find(p) == this->_neighbors.end()) {
 		this->_edgeCount++;
 		p->_edgeCount++;
 
 		this->_neighbors.insert(p);
 		p->_neighbors.insert(this);
+
+		return true;
 	}
+
+	return false;
 }
 
 void Point::disconnect(Point* p) {
@@ -40,7 +48,7 @@ void Point::disconnect(Point* p) {
 	}
 }
 
-bool Point::isComplete(bool checkEntrance) {
+bool Point::isComplete() {
 	if (this->_edgeCount < 1) {
 		return false;
 	}
@@ -51,37 +59,41 @@ bool Point::isComplete(bool checkEntrance) {
 		}
 	}
 
-	if (checkEntrance) {
-		if (this->_type != PointType::ENTRANCE) {
-			if (!this->isReachable(set<Point*>())) {
-				return false;
-			}
-		}
-	}
-
 	return true;
 }
 
-bool Point::isReachable(set<Point*> visited) {
-	for each (auto n in this->_neighbors) {
-		if (n->_type == PointType::ENTRANCE) {
-			return true;
-		}
-	}
+void Point::reset() {
+	this->_edgeCount = 0;
+	this->_neighbors.clear();
+}
 
+void Point::reachablePoints(set<Point*>& points, set<Point*> visited) {
 	visited.insert(this);
 
 	for each (auto n in this->_neighbors) {
 		if (visited.find(n) != visited.end()) {
 			continue;
 		}
-		return n->isReachable(visited);
-	}
 
-	return false;
+		points.insert(n);
+		visited.insert(n);
+		n->reachablePoints(points, visited);
+	}
 }
 
-void Point::reset() {
-	this->_edgeCount = 0;
-	this->_neighbors.clear();
+bool Point::connectedToEntrance(vector<Point*>& tree) {
+	set<Point*> reachablePoints;
+	for each (auto p in tree) {
+		if (p->_type == PointType::ENTRANCE) {
+			reachablePoints.insert(p);
+
+			set<Point*> points;
+			p->reachablePoints(points, set<Point*>());
+
+			for each (auto pp in points) {
+				reachablePoints.insert(pp);
+			}
+		}
+	}
+	return std::find(reachablePoints.begin(), reachablePoints.end(), this) != reachablePoints.end();
 }
