@@ -18,7 +18,7 @@ public:
 	void addEdge(Point* u, Point* v, float w);
 	float findWeight(int u, int v);
 
-	float kruskal();
+	float kruskal(bool sortEdges = true);
 	void filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E);
 	void connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Point*, Point*, float>>& ee, vector<tuple<Point*, Point*, float>>& E, bool keepUnsuccessfulConnections = false);
 };

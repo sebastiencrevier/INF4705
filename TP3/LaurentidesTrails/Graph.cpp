@@ -58,7 +58,7 @@ float Graph::findWeight(int u, int v) {
 	return it->second;
 }
 
-float Graph::kruskal() {
+float Graph::kruskal(bool sortEdges) {
 	// Order edges by minimal cost
 	auto edges = map<pair<int, int>, float>();
 	for (int i = 0; i < this->V; i++) {
@@ -71,10 +71,12 @@ float Graph::kruskal() {
 	auto ee = vector<tuple<Point*, Point*, float>>();
 	for (const auto & e : edges) { ee.push_back(make_tuple(points[e.first.first], points[e.first.second], e.second)); }
 
-	std::sort(ee.begin(), ee.end(),
-		[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
-		return get<2>(a) < get<2>(b);
-	});
+	if (sortEdges) {
+		std::sort(ee.begin(), ee.end(),
+			[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
+			return get<2>(a) < get<2>(b);
+		});
+	}
 
 	auto E = vector<tuple<Point*, Point*, float>>();
 	int k = 1;

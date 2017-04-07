@@ -1,9 +1,9 @@
 #include "Graph.h"
 
-float run(string fileName) {
+float run(string fileName, bool sortEdges) {
 	Graph g(fileName);
 
-	return g.kruskal();
+	return g.kruskal(sortEdges);
 }
 
 void runExamples(map<string, float>& results) {
@@ -12,14 +12,22 @@ void runExamples(map<string, float>& results) {
 			std::stringstream ss;
 			ss << "Parc" << i << "-" << j << "Zones";
 
-			auto success = run("data/" + ss.str() + ".txt");
-			results.insert(make_pair(ss.str(), success));
+			auto cost = run("data/" + ss.str() + ".txt", true);
+
+			// Run a second time without sorting the edges
+			if (cost < 0) {
+				cost = run("data/" + ss.str() + ".txt", false);
+			}
+
+			results.insert(make_pair(ss.str(), cost));
 		}
 	}
 }
 
 int main() {
 	auto start = std::clock();
+
+	//run("data/Parc1-40Zones.txt", false);
 
 	map<string, float> results;
 	runExamples(results);
