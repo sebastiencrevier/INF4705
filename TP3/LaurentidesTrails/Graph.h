@@ -9,7 +9,8 @@ typedef pair<Point*, float> PointWeightPair;
 class Graph {
 	int V;
 	vector<PointWeightPair> *adj;
-	vector<Point*> points;
+	vector<Point*>* points;
+	map<pair<int, int>, float>* edges;
 
 public:
 	Graph(int V);
@@ -18,7 +19,7 @@ public:
 	void addEdge(Point* u, Point* v, float w);
 	float findWeight(int u, int v);
 
-	float kruskal(bool sortEdges = true);
+	float kruskal(bool sortEdgesByCost);
 	void filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E);
 	void connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Point*, Point*, float>>& ee, vector<tuple<Point*, Point*, float>>& E, bool keepUnsuccessfulConnections = false);
 };

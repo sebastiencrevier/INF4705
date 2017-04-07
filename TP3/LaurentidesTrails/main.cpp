@@ -1,43 +1,68 @@
 #include "Graph.h"
+#include <Windows.h>
 
-float run(string fileName, bool sortEdges) {
-	Graph g(fileName);
+void runContinuously(string fileName, float& bestCost, float maxCost) {
+	float cost = -1;
+	do {
+		cost = 5;
+	} while (cost < 0 || bestCost <= cost);
 
-	return g.kruskal(sortEdges);
+	if (cost > maxCost) {
+		runContinuously(fileName, cost, maxCost);
+	}
 }
 
-void runExamples(map<string, float>& results) {
-	for (int i = 1; i <= 5; i++) {
-		for (int j = 10; j <= 40; j *= 2) {
-			std::stringstream ss;
-			ss << "Parc" << i << "-" << j << "Zones";
+bool listenKeyPress(short p_key) {
+	const unsigned short MSB = 0x8000;
 
-			auto cost = run("data/" + ss.str() + ".txt", true);
-
-			// Run a second time without sorting the edges
-			if (cost < 0) {
-				cost = run("data/" + ss.str() + ".txt", false);
-			}
-
-			results.insert(make_pair(ss.str(), cost));
-		}
+	//if p_key is pushed, the MSB will be set at 1
+	if (GetAsyncKeyState(p_key) & MSB) {
+		return true;
 	}
+
+	return false;
 }
 
 int main() {
 	auto start = std::clock();
 
-	//run("data/Parc1-40Zones.txt", false);
+	map<string, pair<Graph*, float>> graphs;
+	for (int i = 1; i <= 5; i++) {
+		for (int j = 10; j <= 40; j *= 2) {
+			std::stringstream ss;
+			ss << "Parc" << i << "-" << j << "Zones";
 
-	map<string, float> results;
-	runExamples(results);
+			auto g = new Graph("data/" + ss.str() + ".txt");
+			auto gg = make_pair(ss.str(), make_pair(g, FLT_MIN));
+			graphs.insert(gg);
+		}
+	}
+
+	auto it = graphs.begin();
+	while (!listenKeyPress(VK_ESCAPE)) {
+		bool firstRun = false;
+		if (it->second.second == FLT_MIN) {
+			it->second.second = FLT_MAX;
+			firstRun = true;
+		}
+
+		auto cost = it->second.first->kruskal(firstRun);
+
+		if (cost > 0 && cost < it->second.second) {
+			it->second.second = cost;
+		}
+
+		if (++it == graphs.end()) {
+			it = graphs.begin();
+		}
+	}
 
 	auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 
 	cout << "\n\n\n\n";
 	cout << "Runtime: " << duration << "\n\n";
-	for each (auto r in results) {
-		cout << r.first << "\t => \t " << r.second << "\n";
+	for each (auto g in graphs) {
+		cout << g.first << "\t => \t " << g.second.second << "\n";
 	}
 
 	return 0;
