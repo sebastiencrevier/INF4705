@@ -58,7 +58,7 @@ float Graph::findWeight(int u, int v) {
 	return it->second;
 }
 
-void Graph::kruskal() {
+float Graph::kruskal() {
 	// Order edges by minimal cost
 	auto edges = map<pair<int, int>, float>();
 	for (int i = 0; i < this->V; i++) {
@@ -134,9 +134,12 @@ void Graph::kruskal() {
 
 	this->filterUnnecessaryEdges(E);
 
+	bool success = true;
+
 	// Print out invalid points if there are any left
 	for each (auto p in this->points) {
 		if (!p->connectedToEntrance(this->points) || !p->isComplete()) {
+			success = false;
 			printf("Point %d is not valid!\n", p->id);
 		}
 	}
@@ -151,6 +154,8 @@ void Graph::kruskal() {
 	cout << "-----------------------------------------\n";
 	printf("Total cost:\t%f\n", cost);
 	cout << "-----------------------------------------\n";
+
+	return success ? cost : -1.0f;
 }
 
 void Graph::filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E) {
