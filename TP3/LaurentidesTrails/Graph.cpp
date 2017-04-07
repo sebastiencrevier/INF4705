@@ -15,6 +15,7 @@ Graph::Graph(string fileName) : _fileName(fileName) {
 		getline(file, line);
 		this->V = stoi(line);
 		this->adj = new vector<PointWeightPair>[this->V];
+		this->adjj = new list<int>[this->V];
 
 		// Vertice types and max edges
 		getline(file, pointTypesLine);
@@ -68,6 +69,10 @@ float Graph::findWeight(int u, int v) {
 }
 
 float Graph::kruskal(bool sortEdgesByCost) {
+	for (int i = 0; i < V; i++) {
+		adjj[i].clear();
+	}
+
 	// Reset points
 	for each (auto point in *this->points) {
 		point->reset();
@@ -87,15 +92,13 @@ float Graph::kruskal(bool sortEdgesByCost) {
 	}
 	else {
 		// Random edge sort
+		std::sort(ee.begin(), ee.end(),
+			[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
+			return get<2>(a) < get<2>(b);
+		});
 
-		// Crashes because of rand() ...
-
-		//std::sort(ee.begin(), ee.end(),
-		//	[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
-		//	return get<2>(a) < get<2>(b) && rand() % 2 == 1;
-		//});
-
-		random_shuffle(ee.begin(), ee.end());
+		// Magic constant!!
+		random_shuffle(ee.begin(), ee.end() - ee.size()/1.1f);
 	}
 
 	auto E = new vector<tuple<Point*, Point*, float>>();
@@ -119,6 +122,7 @@ float Graph::kruskal(bool sortEdgesByCost) {
 			if (connected) {
 				E->push_back(ek);
 				unusedEdgeIndices.erase(k);
+				addEdge(i->id, j->id);
 
 				bool saturated = true;
 				for each (auto e in *E) {
@@ -127,10 +131,11 @@ float Graph::kruskal(bool sortEdgesByCost) {
 					}
 				}
 
-				if (saturated) {
+				if (saturated || isCyclic()) {
 					E->pop_back();
 					i->disconnect(j);
 					unusedEdgeIndices.insert(k);
+					removeEdge(i->id, j->id);
 				}
 			}
 		}
@@ -232,4 +237,55 @@ void Graph::connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Poi
 			it++;
 		}
 	}
+}
+
+void Graph::addEdge(int v, int w) {
+	adjj[v].push_back(w); // Add w to v’s list.
+	adjj[w].push_back(v); // Add v to w’s list.
+}
+
+void Graph::removeEdge(int v, int w) {
+	adjj[v].remove(w); // Add w to v’s list.
+	adjj[w].remove(v); // Add v to w’s list.
+}
+
+// A recursive function that uses visited[] and parent to detect
+// cycle in subgraph reachable from vertex v.
+bool Graph::isCyclicUtil(int v, bool visited[], int parent) {
+	// Mark the current node as visited
+	visited[v] = true;
+
+	// Recur for all the vertices adjacent to this vertex
+	list<int>::iterator i;
+	for (i = adjj[v].begin(); i != adjj[v].end(); ++i) {
+		// If an adjacent is not visited, then recur for that adjacent
+		if (!visited[*i]) {
+			if (isCyclicUtil(*i, visited, v))
+				return true;
+		}
+
+		// If an adjacent is visited and not parent of current vertex,
+		// then there is a cycle.
+		else if (*i != parent)
+			return true;
+	}
+	return false;
+}
+
+// Returns true if the graph contains a cycle, else false.
+bool Graph::isCyclic() {
+	// Mark all the vertices as not visited and not part of recursion
+	// stack
+	bool *visited = new bool[V];
+	for (int i = 0; i < V; i++)
+		visited[i] = false;
+
+	// Call the recursive helper function to detect cycle in different
+	// DFS trees
+	for (int u = 0; u < V; u++)
+		if (!visited[u]) // Don't recur for u if it is already visited
+			if (isCyclicUtil(u, visited, -1))
+				return true;
+
+	return false;
 }

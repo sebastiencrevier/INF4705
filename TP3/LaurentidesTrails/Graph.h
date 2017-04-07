@@ -13,6 +13,12 @@ class Graph {
 	map<pair<int, int>, float>* edges;
 	vector<tuple<Point*, Point*, float>>* lastSolution;
 
+	list<int> *adjj;
+	bool isCyclicUtil(int v, bool visited[], int parent);
+	bool isCyclic();
+	void addEdge(int v, int w);
+	void removeEdge(int, int w);
+
 public:
 	Graph(int V);
 	Graph(string fileName);

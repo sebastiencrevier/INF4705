@@ -1,5 +1,5 @@
 #include "Graph.h"
-//#include <Windows.h>
+#include <Windows.h>
 
 void runContinuously(string fileName, float& bestCost, float maxCost) {
 	float cost = -1;
@@ -12,16 +12,16 @@ void runContinuously(string fileName, float& bestCost, float maxCost) {
 	}
 }
 
-//bool listenKeyPress(short p_key) {
-//	const unsigned short MSB = 0x8000;
-//
-//	//if p_key is pushed, the MSB will be set at 1
-//	if (GetAsyncKeyState(p_key) & MSB) {
-//		return true;
-//	}
-//
-//	return false;
-//}
+bool listenKeyPress(short p_key) {
+	const unsigned short MSB = 0x8000;
+
+	//if p_key is pushed, the MSB will be set at 1
+	if (GetAsyncKeyState(p_key) & MSB) {
+		return true;
+	}
+
+	return false;
+}
 
 int main() {
 	auto start = std::clock();
@@ -38,8 +38,10 @@ int main() {
 		}
 	}
 
+	double duration = 0;
+
 	auto it = graphs.begin();
-	while (true) {
+	while (duration >= 0 && duration < 180) {
 		bool firstRun = false;
 		if (it->second.second == FLT_MIN) {
 			it->second.second = FLT_MAX;
@@ -56,15 +58,20 @@ int main() {
 		if (++it == graphs.end()) {
 			it = graphs.begin();
 		}
+
+		duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 	}
 
-	auto duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 
-	cout << "\n\n\n\n";
+	ofstream cout("results/output" + std::to_string(long(std::time(nullptr))) + ".txt");
+
+	float totalCost = 0;
 	cout << "Runtime: " << duration << "\n\n";
 	for each (auto g in graphs) {
+		totalCost += g.second.second;
 		cout << g.first << "\t => \t " << g.second.second << "\n";
 	}
+	cout << "\nTotal cost: \t " + std::to_string(totalCost);
 
 	return 0;
 }
