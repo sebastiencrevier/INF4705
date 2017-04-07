@@ -1,5 +1,5 @@
 #include "Graph.h"
-#include <Windows.h>
+//#include <Windows.h>
 
 void runContinuously(string fileName, float& bestCost, float maxCost) {
 	float cost = -1;
@@ -12,16 +12,16 @@ void runContinuously(string fileName, float& bestCost, float maxCost) {
 	}
 }
 
-bool listenKeyPress(short p_key) {
-	const unsigned short MSB = 0x8000;
-
-	//if p_key is pushed, the MSB will be set at 1
-	if (GetAsyncKeyState(p_key) & MSB) {
-		return true;
-	}
-
-	return false;
-}
+//bool listenKeyPress(short p_key) {
+//	const unsigned short MSB = 0x8000;
+//
+//	//if p_key is pushed, the MSB will be set at 1
+//	if (GetAsyncKeyState(p_key) & MSB) {
+//		return true;
+//	}
+//
+//	return false;
+//}
 
 int main() {
 	auto start = std::clock();
@@ -39,7 +39,7 @@ int main() {
 	}
 
 	auto it = graphs.begin();
-	while (!listenKeyPress(VK_ESCAPE)) {
+	while (true) {
 		bool firstRun = false;
 		if (it->second.second == FLT_MIN) {
 			it->second.second = FLT_MAX;
@@ -50,6 +50,7 @@ int main() {
 
 		if (cost > 0 && cost < it->second.second) {
 			it->second.second = cost;
+			it->second.first->printLastSolution();
 		}
 
 		if (++it == graphs.end()) {

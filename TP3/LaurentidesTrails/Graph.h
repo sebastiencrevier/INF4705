@@ -11,6 +11,7 @@ class Graph {
 	vector<PointWeightPair> *adj;
 	vector<Point*>* points;
 	map<pair<int, int>, float>* edges;
+	vector<tuple<Point*, Point*, float>>* lastSolution;
 
 public:
 	Graph(int V);
@@ -22,4 +23,9 @@ public:
 	float kruskal(bool sortEdgesByCost);
 	void filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E);
 	void connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Point*, Point*, float>>& ee, vector<tuple<Point*, Point*, float>>& E, bool keepUnsuccessfulConnections = false);
+
+	void printLastSolution();
+
+private:
+	string _fileName;
 };

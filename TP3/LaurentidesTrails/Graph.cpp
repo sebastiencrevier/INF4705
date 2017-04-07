@@ -6,7 +6,7 @@ Graph::Graph(int V) {
 	adj = new vector<PointWeightPair>[V];
 }
 
-Graph::Graph(string fileName) {
+Graph::Graph(string fileName) : _fileName(fileName) {
 	string line, pointTypesLine, pointEdgesLine;
 	ifstream file(fileName);
 
@@ -87,13 +87,18 @@ float Graph::kruskal(bool sortEdgesByCost) {
 	}
 	else {
 		// Random edge sort
-		std::sort(ee.begin(), ee.end(),
-			[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
-			return get<2>(a) < get<2>(b) && rand() % 2 == 1;
-		});
+
+		// Crashes because of rand() ...
+
+		//std::sort(ee.begin(), ee.end(),
+		//	[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
+		//	return get<2>(a) < get<2>(b) && rand() % 2 == 1;
+		//});
+
+		random_shuffle(ee.begin(), ee.end());
 	}
 
-	auto E = vector<tuple<Point*, Point*, float>>();
+	auto E = new vector<tuple<Point*, Point*, float>>();
 	int k = 1;
 
 	set<int> unusedEdgeIndices;
@@ -112,18 +117,18 @@ float Graph::kruskal(bool sortEdgesByCost) {
 		if (i->canConnect() && j->canConnect()) {
 			auto connected = i->connect(j);
 			if (connected) {
-				E.push_back(ek);
+				E->push_back(ek);
 				unusedEdgeIndices.erase(k);
 
 				bool saturated = true;
-				for each (auto e in E) {
+				for each (auto e in *E) {
 					if (get<0>(e)->canConnect() || get<1>(e)->canConnect()) {
 						saturated = false;
 					}
 				}
 
 				if (saturated) {
-					E.pop_back();
+					E->pop_back();
 					i->disconnect(j);
 					unusedEdgeIndices.insert(k);
 				}
@@ -133,18 +138,18 @@ float Graph::kruskal(bool sortEdgesByCost) {
 	}
 
 	if (k == ee.size()) {
-		cout << "Warning: Kruskal didn't manage to complete all the points!\n";
+		//cout << "Warning: Kruskal didn't manage to complete all the points!\n";
 	}
 
-	this->filterUnnecessaryEdges(E);
+	this->filterUnnecessaryEdges(*E);
 
-	this->connectedInvalidPoints(unusedEdgeIndices, ee, E);
+	this->connectedInvalidPoints(unusedEdgeIndices, ee, *E);
 
-	this->filterUnnecessaryEdges(E);
+	this->filterUnnecessaryEdges(*E);
 
-	this->connectedInvalidPoints(unusedEdgeIndices, ee, E, true);
+	this->connectedInvalidPoints(unusedEdgeIndices, ee, *E, true);
 
-	this->filterUnnecessaryEdges(E);
+	this->filterUnnecessaryEdges(*E);
 
 	bool success = true;
 
@@ -152,22 +157,31 @@ float Graph::kruskal(bool sortEdgesByCost) {
 	for each (auto p in *this->points) {
 		if (!p->connectedToEntrance(*this->points) || !p->isComplete()) {
 			success = false;
-			printf("Point %d is not valid!\n", p->id);
+			//printf("Point %d is not valid!\n", p->id);
 		}
 	}
 
-	// Print out results
-	cout << "\n\n---------------- Results ----------------\n";
 	auto cost = 0.0f;
-	for each (auto e in E) {
+	for each (auto e in *E) {
+		cost += get<2>(e);
+	}
+
+	this->lastSolution = E;
+	return success ? cost : -1.0f;
+}
+
+void Graph::printLastSolution() {
+	cout << "\n\n\n-----------------------------------------\n";
+	cout << this->_fileName;
+	cout << "\n-----------------------------------------\n";
+	auto cost = 0.0f;
+	for each (auto e in *this->lastSolution) {
 		printf("%d-%d:\t%f\n", get<0>(e)->id, get<1>(e)->id, get<2>(e));
 		cost += get<2>(e);
 	}
 	cout << "-----------------------------------------\n";
 	printf("Total cost:\t%f\n", cost);
 	cout << "-----------------------------------------\n";
-
-	return success ? cost : -1.0f;
 }
 
 void Graph::filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E) {
@@ -181,7 +195,7 @@ void Graph::filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E) {
 			i->connect(j);
 			++it;
 		} else {
-			printf("Removing extra edge: %d-%d\n", i->id, j->id);
+			//printf("Removing extra edge: %d-%d\n", i->id, j->id);
 			it = E.erase(it);
 		}
 	}
@@ -193,10 +207,10 @@ void Graph::connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Poi
 		auto it = unusedEdgeIndices.begin();
 
 		if (!p->connectedToEntrance(*this->points)) {
-			printf("Point %d not connected to entrance!\n", p->id);
+			//printf("Point %d not connected to entrance!\n", p->id);
 		}
 		if (!p->isComplete()) {
-			printf("Point %d not complete!\n", p->id);
+			//printf("Point %d not complete!\n", p->id);
 		}
 
 		while (it != unusedEdgeIndices.end() && (!p->connectedToEntrance(*this->points) || !p->isComplete())) {
@@ -210,7 +224,7 @@ void Graph::connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Poi
 					if (!keepUnsuccessfulConnections && (!p->connectedToEntrance(*this->points) || !p->isComplete())) {
 						i->disconnect(j);
 					} else {
-						printf("Added edge %d-%d\n", i->id, j->id);
+						//printf("Added edge %d-%d\n", i->id, j->id);
 						E.push_back(edge);
 					}
 				}
