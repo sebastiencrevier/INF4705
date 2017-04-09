@@ -2,6 +2,8 @@
 
 #include "stdc++.h"
 #include "Point.h"
+#include <random>
+#include <thread>
 using namespace std;
 
 typedef pair<Point*, float> PointWeightPair;

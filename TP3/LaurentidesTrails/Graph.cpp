@@ -81,7 +81,7 @@ float Graph::kruskal(bool sortEdgesByCost) {
 	auto ee = vector<tuple<Point*, Point*, float>>();
 	for (const auto & e : *this->edges) { ee.push_back(make_tuple((*this->points)[e.first.first], (*this->points)[e.first.second], e.second)); }
 
-	srand(time(0));
+	static thread_local std::mt19937 generator{ std::random_device{}() };
 
 	if (sortEdgesByCost) {
 		// Edge sort by cost
@@ -98,11 +98,14 @@ float Graph::kruskal(bool sortEdgesByCost) {
 		});
 
 		// Magic constant!!
-		random_shuffle(ee.begin(), ee.end() - ee.size()/1.1f);
+		shuffle(ee.begin(), ee.end() - ee.size()/1.1f, generator);
 	}
 
 	auto E = new vector<tuple<Point*, Point*, float>>();
-	int k = 1;
+
+	//std::uniform_int_distribution<int> gen(0, 2);
+
+	int k = 1; //gen(rng);
 
 	set<int> unusedEdgeIndices;
 	for (int i = 0; i < ee.size(); i++) {
