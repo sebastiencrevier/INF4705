@@ -3,6 +3,9 @@
 Point::Point(int id, PointType type, int maxEdgeCount) : id(id), _type(type), _maxEdgeCount(maxEdgeCount) {
 }
 
+Point::Point(const Point& p) : Point(p.id, p._type, p._maxEdgeCount) {
+}
+
 Point::~Point() {
 }
 

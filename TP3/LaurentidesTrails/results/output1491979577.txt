@@ -1,0 +1,19 @@
+Runtime: 197.111000
+
+Parc1-10Zones	 => 	 402.773
+Parc1-20Zones	 => 	 487.695
+Parc1-40Zones	 => 	 1106.77
+Parc2-10Zones	 => 	 445.925
+Parc2-20Zones	 => 	 809.141
+Parc2-40Zones	 => 	 1171.6
+Parc3-10Zones	 => 	 460.201
+Parc3-20Zones	 => 	 781.603
+Parc3-40Zones	 => 	 1206.75
+Parc4-10Zones	 => 	 651.254
+Parc4-20Zones	 => 	 602.184
+Parc4-40Zones	 => 	 991.681
+Parc5-10Zones	 => 	 447.478
+Parc5-20Zones	 => 	 749.137
+Parc5-40Zones	 => 	 1119.23
+
+Total cost: 	 11433.421875

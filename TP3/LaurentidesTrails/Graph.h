@@ -1,38 +1,43 @@
 #pragma once
-
-#include "stdc++.h"
-#include "Point.h"
 #include <random>
 #include <thread>
+#include <mutex>
+#include "stdc++.h"
+#include "Point.h"
+#include "Edge.h"
+#include "Solution.h"
+
 using namespace std;
 
-typedef pair<Point*, float> PointWeightPair;
+struct EdgeIndices {
+	int a;
+	int b;
+	float cost;
+};
 
 class Graph {
 	int V;
-	vector<PointWeightPair> *adj;
-	vector<Point*>* points;
-	map<pair<int, int>, float>* edges;
-	vector<tuple<Point*, Point*, float>>* lastSolution;
+	vector<EdgeIndices> edges;
+	vector<Point*> points;
 
-	list<int> *adjj;
-	bool isCyclicUtil(int v, bool visited[], int parent);
-	bool isCyclic();
-	void addEdge(int v, int w);
-	void removeEdge(int, int w);
+	bool isCyclicUtil(int v, bool visited[], int parent, list<int>* adj);
+	bool isCyclic(list<int>* adj);
+	void addEdge(int v, int w, list<int>* adj);
+	void removeEdge(int, int w, list<int>* adj);
+
+	static mutex printMtx;
+	mutex solutionMtx;
 
 public:
-	Graph(int V);
 	Graph(string fileName);
 
-	void addEdge(Point* u, Point* v, float w);
-	float findWeight(int u, int v);
+	bool kruskal(bool sortEdgesByCost);
+	void filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points);
+	void connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections);
 
-	float kruskal(bool sortEdgesByCost);
-	void filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E);
-	void connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Point*, Point*, float>>& ee, vector<tuple<Point*, Point*, float>>& E, bool keepUnsuccessfulConnections = false);
+	void printSolution();
 
-	void printLastSolution();
+	Solution* solution = nullptr;
 
 private:
 	string _fileName;

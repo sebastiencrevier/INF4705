@@ -14,6 +14,7 @@ enum class PointType {
 class Point {
 public:
 	Point(int id, PointType type, int maxEdgeCount);
+	Point(const Point& p);
 	~Point();
 
 	int id = -1;

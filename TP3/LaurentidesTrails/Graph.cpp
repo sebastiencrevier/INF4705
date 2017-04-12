@@ -1,10 +1,7 @@
 #include "Graph.h"
 #include "Utilities.h"
 
-Graph::Graph(int V) {
-	this->V = V;
-	adj = new vector<PointWeightPair>[V];
-}
+mutex Graph::printMtx;
 
 Graph::Graph(string fileName) : _fileName(fileName) {
 	string line, pointTypesLine, pointEdgesLine;
@@ -14,8 +11,6 @@ Graph::Graph(string fileName) : _fileName(fileName) {
 		// Number of vertices
 		getline(file, line);
 		this->V = stoi(line);
-		this->adj = new vector<PointWeightPair>[this->V];
-		this->adjj = new list<int>[this->V];
 
 		// Vertice types and max edges
 		getline(file, pointTypesLine);
@@ -26,214 +21,198 @@ Graph::Graph(string fileName) : _fileName(fileName) {
 		splitByWhitespace(pointTypesLine, pointTypes);
 		splitByWhitespace(pointEdgesLine, pointEdges);
 
-		this->points = new vector<Point*>();
 		for (int i = 0; i < this->V; i++) {
-			this->points->push_back(new Point(i, static_cast<PointType>(stoi(pointTypes[i])), stoi(pointEdges[i])));
+			this->points.push_back(new Point(i, static_cast<PointType>(stoi(pointTypes[i])), stoi(pointEdges[i])));
 		}
 
 		// Adjacent edge cost matrix
 		for (int v = 0; v < this->V; v++) {
 			getline(file, line);
 
-			auto edges = vector<string>();
-			splitByWhitespace(line, edges);
+			auto costs = vector<string>();
+			splitByWhitespace(line, costs);
 
-			for (int u = 0; u < this->V; u++) {
-				this->addEdge((*this->points)[v], (*this->points)[u], stof(edges[u]));
+			for (int u = v + 1; u < this->V; u++) {
+				this->edges.push_back({ v, u, stof(costs[u]) });
 			}
 		}
 
 		file.close();
-
-		this->edges = new map<pair<int, int>, float>();
-		for (int i = 0; i < this->V; i++) {
-			for each (PointWeightPair pair in this->adj[i]) {
-				if (pair.first->id > i)
-					this->edges->insert(make_pair(make_pair(i, pair.first->id), pair.second));
-			}
-		}
 	}
 }
 
-void Graph::addEdge(Point* u, Point* v, float w) {
-	adj[u->id].push_back(make_pair(v, w));
-	adj[v->id].push_back(make_pair(u, w));
-}
-
-float Graph::findWeight(int u, int v) {
-	auto it = std::find_if(this->adj[u].begin(),
-		this->adj[u].end(),
-		[&v](const PointWeightPair& p) { return p.first->id == v; });
-
-	return it->second;
-}
-
-float Graph::kruskal(bool sortEdgesByCost) {
-	for (int i = 0; i < V; i++) {
-		adjj[i].clear();
+bool Graph::kruskal(bool sortEdgesByCost) {
+	// Deep copy points
+	vector<Point*> points;
+	for each (auto point in this->points) {
+		points.push_back(new Point(*point));
 	}
 
-	// Reset points
-	for each (auto point in *this->points) {
-		point->reset();
+	vector<Edge*> edges;
+	for each (auto e in this->edges) {
+		edges.push_back(new Edge(points[e.a], points[e.b], e.cost));
 	}
 
-	auto ee = vector<tuple<Point*, Point*, float>>();
-	for (const auto & e : *this->edges) { ee.push_back(make_tuple((*this->points)[e.first.first], (*this->points)[e.first.second], e.second)); }
+	auto adj = new list<int>[this->V];
 
 	static thread_local std::mt19937 generator{ std::random_device{}() };
 
 	if (sortEdgesByCost) {
 		// Edge sort by cost
-		std::sort(ee.begin(), ee.end(),
-			[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
-			return get<2>(a) < get<2>(b);
+		std::sort(edges.begin(), edges.end(),
+			[](const Edge* a, const Edge* b) {
+			return a->cost() < b->cost();
 		});
-	}
-	else {
+	} else {
 		// Random edge sort
-		std::sort(ee.begin(), ee.end(),
-			[](const tuple<Point*, Point*, float>& a, const tuple<Point*, Point*, float>& b) {
-			return get<2>(a) < get<2>(b);
+		std::sort(edges.begin(), edges.end(),
+			[](const Edge* a, const Edge* b) {
+			return a->cost() < b->cost();
 		});
 
 		// Magic constant!!
-		shuffle(ee.begin(), ee.end() - ee.size()/1.1f, generator);
+		shuffle(edges.begin(), edges.end() - edges.size() / 1.1f, generator);
 	}
 
-	auto E = new vector<tuple<Point*, Point*, float>>();
+	vector<Edge*> tree;
 
 	//std::uniform_int_distribution<int> gen(0, 2);
 
 	int k = 1; //gen(rng);
 
-	set<int> unusedEdgeIndices;
-	for (int i = 0; i < ee.size(); i++) {
-		unusedEdgeIndices.insert(i);
-	}
-
 	// Kruskal MST
-	while (k < ee.size() &&
-		std::any_of(this->points->begin(), this->points->end(), [](Point* p) {return !p->isComplete(); })) {
+	while (k < edges.size() && std::any_of(points.begin(), points.end(), [](Point* p) {return !p->isComplete(); })) {
+		auto ek = edges[k];
+		auto a = ek->a();
+		auto b = ek->b();
 
-		auto ek = ee[k];
-		auto i = get<0>(ek);
-		auto j = get<1>(ek);
-
-		if (i->canConnect() && j->canConnect()) {
-			auto connected = i->connect(j);
+		if (a->canConnect() && b->canConnect()) {
+			auto connected = a->connect(b);
 			if (connected) {
-				E->push_back(ek);
-				unusedEdgeIndices.erase(k);
-				addEdge(i->id, j->id);
+				tree.push_back(ek);
+				addEdge(a->id, b->id, adj);
 
 				bool saturated = true;
-				for each (auto e in *E) {
-					if (get<0>(e)->canConnect() || get<1>(e)->canConnect()) {
+				for each (auto e in tree) {
+					if (e->a()->canConnect() || e->b()->canConnect()) {
 						saturated = false;
 					}
 				}
 
-				if (saturated || isCyclic()) {
-					E->pop_back();
-					i->disconnect(j);
-					unusedEdgeIndices.insert(k);
-					removeEdge(i->id, j->id);
+				if (saturated || isCyclic(adj)) {
+					tree.pop_back();
+					a->disconnect(b);
+					removeEdge(a->id, b->id, adj);
 				}
 			}
 		}
 		k++;
 	}
 
-	if (k == ee.size()) {
+	if (k == edges.size()) {
 		//cout << "Warning: Kruskal didn't manage to complete all the points!\n";
 	}
 
-	this->filterUnnecessaryEdges(*E);
+	std::sort(edges.begin(), edges.end());
+	std::sort(tree.begin(), tree.end());
 
-	this->connectedInvalidPoints(unusedEdgeIndices, ee, *E);
+	vector<Edge*> unusedEdges;
+	set_difference(
+		edges.begin(), edges.end(),
+		tree.begin(), tree.end(),
+		std::back_inserter(unusedEdges)
+	);
 
-	this->filterUnnecessaryEdges(*E);
+	this->filterUnnecessaryEdges(tree, points);
 
-	this->connectedInvalidPoints(unusedEdgeIndices, ee, *E, true);
+	this->connectInvalidPoints(tree, unusedEdges, points, false);
+	this->filterUnnecessaryEdges(tree, points);
 
-	this->filterUnnecessaryEdges(*E);
-
-	bool success = true;
+	this->connectInvalidPoints(tree, unusedEdges, points, true);
+	this->filterUnnecessaryEdges(tree, points);
 
 	// Print out invalid points if there are any left
-	for each (auto p in *this->points) {
-		if (!p->connectedToEntrance(*this->points) || !p->isComplete()) {
-			success = false;
+	for each (auto p in points) {
+		if (!p->connectedToEntrance(points) || !p->isComplete()) {
+			return false;
 			//printf("Point %d is not valid!\n", p->id);
 		}
 	}
 
-	auto cost = 0.0f;
-	for each (auto e in *E) {
-		cost += get<2>(e);
+	auto newSolution = new Solution(tree);
+
+	this->solutionMtx.lock();
+	if (this->solution == nullptr || this->solution->cost() > newSolution->cost()) {
+		delete this->solution;
+		this->solution = newSolution;
+
+		this->solutionMtx.unlock();
+
+		return true;
 	}
 
-	this->lastSolution = E;
-	return success ? cost : -1.0f;
+	this->solutionMtx.unlock();
+
+	return false;
 }
 
-void Graph::printLastSolution() {
+void Graph::printSolution() {
+	this->printMtx.lock();
+
+	if (this->solution == nullptr) {
+		cout << "\nAucune solution\n";
+		return;
+	}
+
 	cout << "\n\n\n-----------------------------------------\n";
 	cout << this->_fileName;
 	cout << "\n-----------------------------------------\n";
-	auto cost = 0.0f;
-	for each (auto e in *this->lastSolution) {
-		printf("%d-%d:\t%f\n", get<0>(e)->id, get<1>(e)->id, get<2>(e));
-		cost += get<2>(e);
-	}
-	cout << "-----------------------------------------\n";
-	printf("Total cost:\t%f\n", cost);
-	cout << "-----------------------------------------\n";
+
+	this->solution->print();
+
+	this->printMtx.unlock();
 }
 
-void Graph::filterUnnecessaryEdges(vector<tuple<Point*, Point*, float>>& E) {
-	auto it = E.begin();
-	while (it != E.end()) {
-		auto i = get<0>(*it);
-		auto j = get<1>(*it);
-		i->disconnect(j);
+void Graph::filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points) {
+	auto it = tree.begin();
+	while (it != tree.end()) {
+		auto a = (*it)->a();
+		auto b = (*it)->b();
+		a->disconnect(b);
 
-		if (!i->isComplete() || !j->isComplete() || !i->connectedToEntrance(*this->points) || !j->connectedToEntrance(*this->points)) {
-			i->connect(j);
+		if (!a->isComplete() || !b->isComplete() || !a->connectedToEntrance(points) || !b->connectedToEntrance(points)) {
+			a->connect(b);
 			++it;
 		} else {
 			//printf("Removing extra edge: %d-%d\n", i->id, j->id);
-			it = E.erase(it);
+			it = tree.erase(it);
 		}
 	}
 }
 
-void Graph::connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Point*, Point*, float>>& ee,
-	vector<tuple<Point*, Point*, float>>& E, bool keepUnsuccessfulConnections) {
-	for each (auto p in *this->points) {
-		auto it = unusedEdgeIndices.begin();
+void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections) {
+	for each (auto p in points) {
+		auto it = unusedEdges.begin();
 
-		if (!p->connectedToEntrance(*this->points)) {
-			//printf("Point %d not connected to entrance!\n", p->id);
-		}
-		if (!p->isComplete()) {
-			//printf("Point %d not complete!\n", p->id);
-		}
+		//if (!p->connectedToEntrance(*this->points)) {
+		//	printf("Point %d not connected to entrance!\n", p->id);
+		//}
+		//if (!p->isComplete()) {
+		//	printf("Point %d not complete!\n", p->id);
+		//}
 
-		while (it != unusedEdgeIndices.end() && (!p->connectedToEntrance(*this->points) || !p->isComplete())) {
-			auto edge = ee[*it];
-			auto i = get<0>(edge);
-			auto j = get<1>(edge);
+		while (it != unusedEdges.end() && (!p->connectedToEntrance(points) || !p->isComplete())) {
+			auto a = (*it)->a();
+			auto b = (*it)->b();
 
-			if (i->canConnect() && j->canConnect()) {
-				auto connected = i->connect(j);
+			if (a->canConnect() && b->canConnect()) {
+				auto connected = a->connect(b);
 				if (connected) {
-					if (!keepUnsuccessfulConnections && (!p->connectedToEntrance(*this->points) || !p->isComplete())) {
-						i->disconnect(j);
+					if (!keepUnsuccessfulConnections && (!p->connectedToEntrance(points) || !p->isComplete())) {
+						a->disconnect(b);
 					} else {
 						//printf("Added edge %d-%d\n", i->id, j->id);
-						E.push_back(edge);
+						tree.push_back(*it);
 					}
 				}
 			}
@@ -242,28 +221,28 @@ void Graph::connectedInvalidPoints(set<int>& unusedEdgeIndices, vector<tuple<Poi
 	}
 }
 
-void Graph::addEdge(int v, int w) {
-	adjj[v].push_back(w); // Add w to v’s list.
-	adjj[w].push_back(v); // Add v to w’s list.
+void Graph::addEdge(int v, int w, list<int>* adj) {
+	adj[v].push_back(w); // Add w to v’s list.
+	adj[w].push_back(v); // Add v to w’s list.
 }
 
-void Graph::removeEdge(int v, int w) {
-	adjj[v].remove(w); // Add w to v’s list.
-	adjj[w].remove(v); // Add v to w’s list.
+void Graph::removeEdge(int v, int w, list<int>* adj) {
+	adj[v].remove(w); // Add w to v’s list.
+	adj[w].remove(v); // Add v to w’s list.
 }
 
 // A recursive function that uses visited[] and parent to detect
 // cycle in subgraph reachable from vertex v.
-bool Graph::isCyclicUtil(int v, bool visited[], int parent) {
+bool Graph::isCyclicUtil(int v, bool visited[], int parent, list<int>* adj) {
 	// Mark the current node as visited
 	visited[v] = true;
 
 	// Recur for all the vertices adjacent to this vertex
 	list<int>::iterator i;
-	for (i = adjj[v].begin(); i != adjj[v].end(); ++i) {
+	for (i = adj[v].begin(); i != adj[v].end(); ++i) {
 		// If an adjacent is not visited, then recur for that adjacent
 		if (!visited[*i]) {
-			if (isCyclicUtil(*i, visited, v))
+			if (isCyclicUtil(*i, visited, v, adj))
 				return true;
 		}
 
@@ -276,7 +255,7 @@ bool Graph::isCyclicUtil(int v, bool visited[], int parent) {
 }
 
 // Returns true if the graph contains a cycle, else false.
-bool Graph::isCyclic() {
+bool Graph::isCyclic(list<int>* adj) {
 	// Mark all the vertices as not visited and not part of recursion
 	// stack
 	bool *visited = new bool[V];
@@ -287,7 +266,7 @@ bool Graph::isCyclic() {
 	// DFS trees
 	for (int u = 0; u < V; u++)
 		if (!visited[u]) // Don't recur for u if it is already visited
-			if (isCyclicUtil(u, visited, -1))
+			if (isCyclicUtil(u, visited, -1, adj))
 				return true;
 
 	return false;
