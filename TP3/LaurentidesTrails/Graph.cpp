@@ -3,7 +3,7 @@
 
 mutex Graph::printMtx;
 
-Graph::Graph(string fileName) : _fileName(fileName) {
+Graph::Graph(string fileName) : fileName(fileName) {
 	string line, pointTypesLine, pointEdgesLine;
 	ifstream file(fileName);
 
@@ -41,15 +41,15 @@ Graph::Graph(string fileName) : _fileName(fileName) {
 	}
 }
 
-bool Graph::kruskal(bool sortEdgesByCost) {
+bool Graph::kruskal(bool sortEdgesByCost, float hyperparam) {
 	// Deep copy points
 	vector<Point*> points;
-	for each (auto point in this->points) {
+	for (auto point : this->points) {
 		points.push_back(new Point(*point));
 	}
 
 	vector<Edge*> edges;
-	for each (auto e in this->edges) {
+	for (auto e : this->edges) {
 		edges.push_back(new Edge(points[e.a], points[e.b], e.cost));
 	}
 
@@ -71,14 +71,14 @@ bool Graph::kruskal(bool sortEdgesByCost) {
 		});
 
 		// Magic constant!!
-		shuffle(edges.begin(), edges.end() - edges.size() / 1.1f, generator);
+		shuffle(edges.begin(), edges.end() - edges.size() / hyperparam, generator);
 	}
 
 	vector<Edge*> tree;
 
 	//std::uniform_int_distribution<int> gen(0, 2);
 
-	int k = 1; //gen(rng);
+	size_t k = 1; //gen(rng);
 
 	// Kruskal MST
 	while (k < edges.size() && std::any_of(points.begin(), points.end(), [](Point* p) {return !p->isComplete(); })) {
@@ -93,7 +93,7 @@ bool Graph::kruskal(bool sortEdgesByCost) {
 				addEdge(a->id, b->id, adj);
 
 				bool saturated = true;
-				for each (auto e in tree) {
+				for (auto e : tree) {
 					if (e->a()->canConnect() || e->b()->canConnect()) {
 						saturated = false;
 					}
@@ -132,7 +132,7 @@ bool Graph::kruskal(bool sortEdgesByCost) {
 	this->filterUnnecessaryEdges(tree, points);
 
 	// Print out invalid points if there are any left
-	for each (auto p in points) {
+	for (auto p : points) {
 		if (!p->connectedToEntrance(points) || !p->isComplete()) {
 			return false;
 			//printf("Point %d is not valid!\n", p->id);
@@ -142,7 +142,7 @@ bool Graph::kruskal(bool sortEdgesByCost) {
 	auto newSolution = new Solution(tree);
 
 	this->solutionMtx.lock();
-	if (this->solution == nullptr || this->solution->cost() > newSolution->cost()) {
+	if (this->solution == nullptr || (this->solution->cost() > newSolution->cost() && newSolution->cost() > 0)) {
 		delete this->solution;
 		this->solution = newSolution;
 
@@ -156,19 +156,30 @@ bool Graph::kruskal(bool sortEdgesByCost) {
 	return false;
 }
 
-void Graph::printSolution() {
+void Graph::print() {
 	this->printMtx.lock();
 
 	if (this->solution == nullptr) {
-		cout << "\nAucune solution\n";
+		return;
+	}
+
+	this->solution->print();
+
+	this->printMtx.unlock();
+}
+
+void Graph::fullPrint() {
+	this->printMtx.lock();
+
+	if (this->solution == nullptr) {
 		return;
 	}
 
 	cout << "\n\n\n-----------------------------------------\n";
-	cout << this->_fileName;
+	cout << this->fileName;
 	cout << "\n-----------------------------------------\n";
 
-	this->solution->print();
+	this->solution->fullPrint();
 
 	this->printMtx.unlock();
 }
@@ -191,7 +202,7 @@ void Graph::filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points) 
 }
 
 void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections) {
-	for each (auto p in points) {
+	for (auto p : points) {
 		auto it = unusedEdges.begin();
 
 		//if (!p->connectedToEntrance(*this->points)) {

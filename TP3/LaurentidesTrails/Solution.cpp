@@ -1,7 +1,7 @@
 #include "Solution.h"
 
 Solution::Solution(vector<Edge*> edges) : _edges(edges) {
-	for each (auto e in edges) {
+	for (auto e : edges) {
 		this->_cost += e->cost();
 	}
 }
@@ -9,11 +9,18 @@ Solution::Solution(vector<Edge*> edges) : _edges(edges) {
 Solution::~Solution() {
 }
 
-void Solution::print() const {
-	for each (auto e in this->_edges) {
-		printf("%d-%d:\t%f\n", e->a()->id, e->b()->id, e->cost());
+void Solution::fullPrint() const {
+	for (auto e : this->_edges) {
+		printf("%s\t%f\n", e->id().c_str(), e->cost());
 	}
 	cout << "-----------------------------------------\n";
 	printf("Total cost:\t%f\n", this->_cost);
 	cout << "-----------------------------------------\n";
+}
+
+void Solution::print() const {
+	for (auto e : this->_edges) {
+		printf("%s\n", e->id().c_str());
+	}
+	cout << "fin\n\n";
 }

@@ -73,7 +73,7 @@ void Point::reset() {
 void Point::reachablePoints(set<Point*>& points, set<Point*> visited) {
 	visited.insert(this);
 
-	for each (auto n in this->_neighbors) {
+	for (auto n : this->_neighbors) {
 		if (visited.find(n) != visited.end()) {
 			continue;
 		}
@@ -86,14 +86,14 @@ void Point::reachablePoints(set<Point*>& points, set<Point*> visited) {
 
 bool Point::connectedToEntrance(vector<Point*>& tree) {
 	set<Point*> reachablePoints;
-	for each (auto p in tree) {
+	for (auto p : tree) {
 		if (p->_type == PointType::ENTRANCE) {
 			reachablePoints.insert(p);
 
 			set<Point*> points;
 			p->reachablePoints(points, set<Point*>());
 
-			for each (auto pp in points) {
+			for (auto pp : points) {
 				reachablePoints.insert(pp);
 			}
 		}

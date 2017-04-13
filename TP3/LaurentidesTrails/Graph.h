@@ -31,14 +31,13 @@ class Graph {
 public:
 	Graph(string fileName);
 
-	bool kruskal(bool sortEdgesByCost);
+	bool kruskal(bool sortEdgesByCost, float hyperparam);
 	void filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points);
 	void connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections);
 
-	void printSolution();
+	void fullPrint();
+	void print();
 
+	string fileName;
 	Solution* solution = nullptr;
-
-private:
-	string _fileName;
 };
