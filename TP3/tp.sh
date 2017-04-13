@@ -25,4 +25,4 @@ esac
 shift
 done
 
-./LaurentidesTrails/tp3 $EX_PATH $OPTIONS $RUNTIME
+./tp3 $EX_PATH $OPTIONS $RUNTIME
