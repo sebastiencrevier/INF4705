@@ -31,10 +31,9 @@ class Graph {
 public:
 	Graph(string fileName);
 
-	bool kruskal(bool sortEdgesByCost, float hyperparam);
+	bool kruskal(bool sortEdgesByCost, bool randomizeInsertion, float hyperparam);
 	void filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points);
-	void connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections);
-
+	void connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections, bool randomizeInsertion, float hyperparam);
 	void fullPrint();
 	void print();
 

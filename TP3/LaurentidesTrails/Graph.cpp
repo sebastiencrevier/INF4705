@@ -41,7 +41,7 @@ Graph::Graph(string fileName) : fileName(fileName) {
 	}
 }
 
-bool Graph::kruskal(bool sortEdgesByCost, float hyperparam) {
+bool Graph::kruskal(bool sortEdgesByCost, bool randomizeInsertion, float hyperparam) {
 	// Deep copy points
 	vector<Point*> points;
 	for (auto point : this->points) {
@@ -125,10 +125,15 @@ bool Graph::kruskal(bool sortEdgesByCost, float hyperparam) {
 
 	this->filterUnnecessaryEdges(tree, points);
 
-	this->connectInvalidPoints(tree, unusedEdges, points, false);
+	this->connectInvalidPoints(tree, unusedEdges, points, false, false, hyperparam);
 	this->filterUnnecessaryEdges(tree, points);
 
-	this->connectInvalidPoints(tree, unusedEdges, points, true);
+	if (randomizeInsertion) {
+		this->connectInvalidPoints(tree, unusedEdges, points, true, true, hyperparam);
+	}
+	else {
+		this->connectInvalidPoints(tree, unusedEdges, points, true, false, hyperparam);
+	}
 	this->filterUnnecessaryEdges(tree, points);
 
 	// Print out invalid points if there are any left
@@ -155,6 +160,7 @@ bool Graph::kruskal(bool sortEdgesByCost, float hyperparam) {
 
 	return false;
 }
+
 
 void Graph::print() {
 	this->printMtx.lock();
@@ -201,7 +207,9 @@ void Graph::filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points) 
 	}
 }
 
-void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections) {
+void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections, bool randomizeInsertion, float hyperparam) {
+	static thread_local std::mt19937 random{ std::random_device{}() };
+	std::uniform_int_distribution<int> distribution(1, tree.size()-1);
 	for (auto p : points) {
 		auto it = unusedEdges.begin();
 
@@ -211,7 +219,7 @@ void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges
 		//if (!p->isComplete()) {
 		//	printf("Point %d not complete!\n", p->id);
 		//}
-
+		
 		while (it != unusedEdges.end() && (!p->connectedToEntrance(points) || !p->isComplete())) {
 			auto a = (*it)->a();
 			auto b = (*it)->b();
@@ -221,8 +229,13 @@ void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges
 				if (connected) {
 					if (!keepUnsuccessfulConnections && (!p->connectedToEntrance(points) || !p->isComplete())) {
 						a->disconnect(b);
-					} else {
+					}
+					else if (randomizeInsertion) {
+						int indexRandom = distribution(random);
 						//printf("Added edge %d-%d\n", i->id, j->id);
+						tree.emplace(tree.begin() + indexRandom, *it);
+					}
+					else{
 						tree.push_back(*it);
 					}
 				}

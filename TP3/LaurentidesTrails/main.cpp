@@ -15,7 +15,7 @@ void compute(vector<Graph*>* graphs, float hyperparam, bool print) {
 	while (duration >= 0 && duration < RUNTIME) {
 		auto g = (*it);
 
-		bool newSolution = g->kruskal(run == 0, hyperparam);
+		bool newSolution = g->kruskal(run == 0, run == 0, hyperparam);
 
 		if (newSolution && print) {
 			g->print();
