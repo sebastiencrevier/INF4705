@@ -33,7 +33,7 @@ public:
 
 	bool kruskal(bool sortEdgesByCost, bool randomizeInsertion, float hyperparam);
 	void filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points);
-	void connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections, bool randomizeInsertion, float hyperparam);
+	void connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections, bool randomizeInsertion);
 	void fullPrint();
 	void print();
 

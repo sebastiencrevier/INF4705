@@ -125,14 +125,14 @@ bool Graph::kruskal(bool sortEdgesByCost, bool randomizeInsertion, float hyperpa
 
 	this->filterUnnecessaryEdges(tree, points);
 
-	this->connectInvalidPoints(tree, unusedEdges, points, false, false, hyperparam);
+	this->connectInvalidPoints(tree, unusedEdges, points, false, false);
 	this->filterUnnecessaryEdges(tree, points);
 
 	if (randomizeInsertion) {
-		this->connectInvalidPoints(tree, unusedEdges, points, true, true, hyperparam);
+		this->connectInvalidPoints(tree, unusedEdges, points, true, true);
 	}
 	else {
-		this->connectInvalidPoints(tree, unusedEdges, points, true, false, hyperparam);
+		this->connectInvalidPoints(tree, unusedEdges, points, true, false);
 	}
 	this->filterUnnecessaryEdges(tree, points);
 
@@ -207,9 +207,8 @@ void Graph::filterUnnecessaryEdges(vector<Edge*>& tree, vector<Point*>& points) 
 	}
 }
 
-void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections, bool randomizeInsertion, float hyperparam) {
+void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges, vector<Point*>& points, bool keepUnsuccessfulConnections, bool randomizeInsertion) {
 	static thread_local std::mt19937 random{ std::random_device{}() };
-	std::uniform_int_distribution<int> distribution(1, tree.size()-1);
 	for (auto p : points) {
 		auto it = unusedEdges.begin();
 
@@ -231,9 +230,10 @@ void Graph::connectInvalidPoints(vector<Edge*>& tree, vector<Edge*>& unusedEdges
 						a->disconnect(b);
 					}
 					else if (randomizeInsertion) {
-						int indexRandom = distribution(random);
+
+						int randomIndex = std::uniform_int_distribution<int>{ (int)1, (int)tree.size() - 1 }(random);
 						//printf("Added edge %d-%d\n", i->id, j->id);
-						tree.emplace(tree.begin() + indexRandom, *it);
+						tree.emplace(tree.begin() + randomIndex, *it);
 					}
 					else{
 						tree.push_back(*it);
